@@ -28,7 +28,7 @@ type Comment = {
   replies: Comment[];
 };
 
-export function ItemDetailPage() {
+function ItemDetailPage() {
   const [comments, setComments] = useState<Comment[]>([
     {
       id: 1,

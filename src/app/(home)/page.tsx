@@ -88,7 +88,7 @@ const projects: Project[] = [
   },
 ];
 
-export function ProjectsListComponent() {
+const ProjectsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
@@ -264,6 +264,6 @@ export function ProjectsListComponent() {
       )}
     </main>
   );
-}
+};
 
-export default ProjectsListComponent;
+export default ProjectsPage;
