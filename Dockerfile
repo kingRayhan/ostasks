@@ -44,6 +44,4 @@ COPY --from=client-builder /app/client/package.json /app/client/package.json
 EXPOSE 3000 4000
 
 # Start both apps
-# CMD ["sh", "-c", "node /app/backend/dist/main.js & next start /app/client -p 3000"]
 CMD ["sh", "-c", "node /app/backend/dist/main.js & npm --prefix /app/client run start"]
-# CMD ["sh", "-c", "node /app/backend/dist/main.js"]
