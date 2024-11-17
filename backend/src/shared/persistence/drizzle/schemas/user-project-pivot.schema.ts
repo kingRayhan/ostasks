@@ -4,7 +4,7 @@
 import { pgTable, uuid } from 'drizzle-orm/pg-core';
 import { commonTimestampColumns } from './common.schema';
 import { userTable } from './user.schema';
-import { projectTable } from './project.schema';
+import { projectsTable } from './project.schema';
 import { relations } from 'drizzle-orm';
 
 export const userProjectPivotTable = pgTable('user__project', {
@@ -13,16 +13,16 @@ export const userProjectPivotTable = pgTable('user__project', {
     .references(() => userTable.id, { onDelete: 'cascade' }),
   projectId: uuid()
     .notNull()
-    .references(() => projectTable.id, { onDelete: 'cascade' }),
+    .references(() => projectsTable.id, { onDelete: 'cascade' }),
   ...commonTimestampColumns,
 });
 
 export const userProjectRelation = relations(
   userProjectPivotTable,
   ({ one }) => ({
-    project: one(projectTable, {
+    project: one(projectsTable, {
       fields: [userProjectPivotTable.projectId],
-      references: [projectTable.id],
+      references: [projectsTable.id],
     }),
     user: one(userTable, {
       fields: [userProjectPivotTable.userId],

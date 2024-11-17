@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { CreateProjectInput } from './dto/create-project.input';
+import {
+  Project,
+  ProjectsWithPagination,
+} from '@/api/project/entities/project.entity';
+import { ProjectRepository } from '@/api/project/project.repository';
+import { CommonCreateMutationResponse } from '@/shared/models/common-response.model';
+import { AppPaginationResponseDto } from '@/shared/persistence/persistence.contract';
+import { CommonPaginationInput } from '@/shared/models/common-gql-pagination.input';
 
 @Injectable()
 export class ProjectService {
-  create(createProjectDto: CreateProjectDto) {
-    return 'This action adds a new project';
+  constructor(private readonly projectRepository: ProjectRepository) {}
+
+  async createProject(
+    input: CreateProjectInput,
+  ): Promise<CommonCreateMutationResponse> {
+    // create project
+    const project = await this.projectRepository.createProject(input);
+
+    // project task status
+    // await this.projectRepository.createDefaultTaskStatusesForProject(
+    //   project.id,
+    // );
+
+    return project;
   }
 
-  findAll() {
-    return `This action returns all project`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} project`;
-  }
-
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} project`;
-  }
+  // async findAllWithPagination(
+  //   payload: CommonPaginationInput,
+  // ): Promise<AppPaginationResponseDto<Project>> {
+  //   return this.projectRepository.findAllWithPagination(payload);
+  // }
 }
