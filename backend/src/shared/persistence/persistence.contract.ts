@@ -22,33 +22,47 @@ export enum ISortType {
   ASC = 'ASC',
   DESC = 'DESC',
 }
-export interface IPagination {
-  page: number;
-  limit: number;
-  fields?: string[];
-  sort?: ISortType;
-  sortBy?: string;
+export interface IPagination<T> {
+  page?: number;
+  limit?: number;
+  filters?: Array<
+    | IPersistentFilter<T>
+    | { or?: IPersistentFilter<T>[]; and?: IPersistentFilter<T>[] }
+  >;
+  columns?: Array<keyof T>;
+  orderBy?: Array<IPersistentOrderBy<T>>;
 }
 
 //------------------------------------
 // Find
 //------------------------------------
-export interface IPersistentFilterPayload {
-  filters: Array<{
-    key: string;
-    value: any;
-    operator:
-      | '='
-      | '<'
-      | '>'
-      | '<='
-      | '>='
-      | '<>'
-      | 'like'
-      | 'ilike'
-      | 'in'
-      | 'not in';
-  }>;
-  columns?: string[];
-  logicalOperator?: 'and' | 'or';
+export interface IPersistentFilter<T> {
+  key: keyof T;
+  value: any;
+  operator:
+    | '='
+    | '<'
+    | '>'
+    | '<='
+    | '>='
+    | '<>'
+    | 'like'
+    | 'ilike'
+    | 'in'
+    | 'not in';
+}
+export interface IPersistentOrderBy<T> {
+  key: keyof T;
+  direction: 'asc' | 'desc';
+}
+
+export interface IPersistentFilterPayload<T> {
+  filters: Array<
+    | IPersistentFilter<T>
+    | { or?: IPersistentFilter<T>[]; and?: IPersistentFilter<T>[] }
+  >;
+  orderBy?: Array<IPersistentOrderBy<T>>;
+  columns?: Array<keyof T>;
+  limit?: number;
+  offset?: number;
 }

@@ -33,10 +33,13 @@ export class UserService {
   async loginUser(input: LoginInput): Promise<LoginResponse> {
     const filteredUsers = await this.userRepository.findRows({
       filters: [
-        { key: 'email', operator: '=', value: input.identifier },
-        { key: 'username', operator: '=', value: input.identifier },
+        {
+          or: [
+            { key: 'email', operator: '=', value: input.identifier },
+            { key: 'username', operator: '=', value: input.identifier },
+          ],
+        },
       ],
-      logicalOperator: 'or',
       columns: ['id', 'email', 'username', 'password'],
     });
 

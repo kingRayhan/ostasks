@@ -14,7 +14,7 @@ import { UserModule } from './api/user/user.module';
       playground: true,
       autoSchemaFile: true,
     }),
-    // ProjectModule,
+    ProjectModule,
     UserModule,
   ],
 })

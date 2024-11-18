@@ -34,7 +34,7 @@ export class ProjectResolver {
     try {
       return this.projectRepository.findAllWithPagination({
         ...input,
-        fields: getGqlFields(info, 'nodes'),
+        columns: getGqlFields(info, 'nodes'),
       });
     } catch (error) {
       throw new ForbiddenException(error.message);

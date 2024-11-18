@@ -1,4 +1,8 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
+import {
+  IPersistentFilter,
+  IPersistentOrderBy,
+} from '@/shared/persistence/persistence.contract';
 
 @InputType()
 export class CommonPaginationInput {
@@ -10,19 +14,20 @@ export class CommonPaginationInput {
   // @IsOptional()
   limit: number;
 
-  // @Field(() => SortType, { nullable: true })
-  // @IsOptional()
-  // sort?: SortType;
+  // filters: Array<
+  //   | IPersistentFilter<T>
+  //   | { or?: IPersistentFilter<T>[]; and?: IPersistentFilter<T>[] }
+  // >;
   //
-  // @Field(() => String, { nullable: true })
-  // @IsOptional()
-  // sortBy?: string;
-  //
-  // @Field(() => [CommonFindDocumentDto], { nullable: true })
-  // @IsOptional()
-  // filters?: CommonFindDocumentDto[];
-  //
-  // @Field(() => WHERE_OPERATOR, { nullable: true })
-  // @IsOptional()
-  // filterOperator?: WHERE_OPERATOR;
+  // orderBy?: Array<IPersistentOrderBy<T>>;
 }
+
+// export class CommonPaginationOrderByInput {
+//   @Field(() => String, { nullable: true })
+//   // @IsOptional()
+//   key: keyof T;
+//
+//   @Field(() => String, { nullable: true })
+//   // @IsOptional()
+//   direction: 'asc' | 'desc';
+// }
