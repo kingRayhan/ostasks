@@ -6,6 +6,6 @@ export default defineConfig({
   schema: './src/shared/persistence/drizzle/schemas.ts',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: 'postgresql://rayhan:rayhan123@localhost:5432/ostasks',
   },
 });

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { ProjectResolver } from './project.resolver';
-import { DrizzleModule } from '@/shared/persistence/drizzle/drizzle.module';
 import { ProjectRepository } from '@/api/project/project.repository';
+import { PersistenceModule } from '@/shared/persistence/persistence.module';
 
 @Module({
-  imports: [DrizzleModule],
+  imports: [PersistenceModule],
   providers: [ProjectResolver, ProjectService, ProjectRepository],
 })
 export class ProjectModule {}

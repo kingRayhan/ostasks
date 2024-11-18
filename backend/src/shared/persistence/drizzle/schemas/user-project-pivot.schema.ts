@@ -7,7 +7,7 @@ import { userTable } from './user.schema';
 import { projectsTable } from './project.schema';
 import { relations } from 'drizzle-orm';
 
-export const userProjectPivotTable = pgTable('user__project', {
+export const userProjectPivotTable = pgTable('user_project__pivot', {
   userId: uuid()
     .notNull()
     .references(() => userTable.id, { onDelete: 'cascade' }),

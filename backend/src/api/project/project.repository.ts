@@ -1,25 +1,14 @@
-import {
-  Project,
-  ProjectsWithPagination,
-} from '@/api/project/entities/project.entity';
-import { taskStatusTable } from '@/shared/persistence/drizzle/schemas/task-status.schema';
-import { Injectable } from '@nestjs/common';
-import { projectsTable } from '@/shared/persistence/drizzle/schemas/project.schema';
-import { BaseDatabaseService } from '@/shared/persistence/base-database.service';
+import { Project } from '@/api/project/entities/project.entity';
+import { PersistentRepository } from '@/shared/persistence/persistentRepository';
 import { DrizzleService } from '@/shared/persistence/drizzle/drizzle.service';
 import { DatabaseTableName } from '@/shared/persistence/drizzle/schemas';
-import { CommonCreateMutationResponse } from '@/shared/models/common-response.model';
+import { taskStatusTable } from '@/shared/persistence/drizzle/schemas/task-status.schema';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class ProjectRepository extends BaseDatabaseService<Project> {
+export class ProjectRepository extends PersistentRepository<Project> {
   constructor(public readonly drizzleService: DrizzleService) {
     super(drizzleService, DatabaseTableName.projects);
-  }
-
-  async createProject(
-    data: Partial<Project>,
-  ): Promise<CommonCreateMutationResponse> {
-    return this.createOne(data);
   }
 
   async createDefaultTaskStatusesForProject(projectId: string) {
@@ -58,38 +47,4 @@ export class ProjectRepository extends BaseDatabaseService<Project> {
       },
     ]);
   }
-
-  // async getAllWithPagination(
-  //   page: number,
-  //   limit: number,
-  //   fields: string[],
-  // ): Promise<ProjectsWithPagination> {
-  //   const _limit = limit || 10;
-  //   const _page = page || 1;
-  //   const _offset = (_page - 1) * _limit;
-  //
-  //   const result = await this.drizzleService.drizzle
-  //     .select({
-  //       id: projectsTable.id,
-  //       title: projectsTable.title,
-  //       shortDescription: projectsTable.shortDescription,
-  //       isActive: projectsTable.isActive,
-  //       createdAt: projectsTable.createdAt,
-  //       updatedAt: projectsTable.updatedAt,
-  //     })
-  //     .from(projectsTable)
-  //     .limit(_limit)
-  //     .offset(_offset)
-  //     .orderBy(projectsTable.createdAt);
-  //
-  //   return {
-  //     nodes: result,
-  //     meta: {
-  //       totalCount: result.length,
-  //       currentPage: _page,
-  //       hasNextPage: result.length > _limit,
-  //       totalPages: Math.ceil(result.length / _limit),
-  //     },
-  //   };
-  // }
 }

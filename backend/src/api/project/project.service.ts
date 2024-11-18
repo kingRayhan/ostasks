@@ -1,13 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProjectInput } from './dto/create-project.input';
-import {
-  Project,
-  ProjectsWithPagination,
-} from '@/api/project/entities/project.entity';
 import { ProjectRepository } from '@/api/project/project.repository';
 import { CommonCreateMutationResponse } from '@/shared/models/common-response.model';
-import { AppPaginationResponseDto } from '@/shared/persistence/persistence.contract';
-import { CommonPaginationInput } from '@/shared/models/common-gql-pagination.input';
 
 @Injectable()
 export class ProjectService {
@@ -17,19 +11,12 @@ export class ProjectService {
     input: CreateProjectInput,
   ): Promise<CommonCreateMutationResponse> {
     // create project
-    const project = await this.projectRepository.createProject(input);
+    const project = await this.projectRepository.createOne(input);
 
     // project task status
-    // await this.projectRepository.createDefaultTaskStatusesForProject(
-    //   project.id,
-    // );
+    const projectId = project.id;
+    await this.projectRepository.createDefaultTaskStatusesForProject(projectId);
 
     return project;
   }
-
-  // async findAllWithPagination(
-  //   payload: CommonPaginationInput,
-  // ): Promise<AppPaginationResponseDto<Project>> {
-  //   return this.projectRepository.findAllWithPagination(payload);
-  // }
 }

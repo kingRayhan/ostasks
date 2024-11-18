@@ -6,6 +6,7 @@ import { commentsTable } from '@/shared/persistence/drizzle/schemas/comment.sche
 
 export * from './schemas/common.schema';
 export * from './schemas/user.schema';
+export * from './schemas/user-project-pivot.schema';
 export * from './schemas/project.schema';
 export * from './schemas/task.schema';
 export * from './schemas/task-status.schema';

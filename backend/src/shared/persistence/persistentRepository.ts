@@ -3,10 +3,11 @@ import {
   DatabaseTableName,
   drizzleSchemaTableMap,
 } from '@/shared/persistence/drizzle/schemas';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import {
   AppPaginationResponseDto,
   IPagination,
+  IPersistentFilterPayload,
 } from '@/shared/persistence/persistence.contract';
 
 /**
@@ -17,7 +18,7 @@ import {
  *
  * @template DOMAIN_MODEL_TYPE - The type of the domain model that this service is responsible for.
  */
-export abstract class BaseDatabaseService<DOMAIN_MODEL_TYPE> {
+export abstract class PersistentRepository<DOMAIN_MODEL_TYPE> {
   protected constructor(
     public readonly drizzleService: DrizzleService,
     public readonly tableName: DatabaseTableName,
@@ -60,17 +61,17 @@ export abstract class BaseDatabaseService<DOMAIN_MODEL_TYPE> {
       payload.fields?.map((field) => `"${field}"`).join(', ') || '*';
 
     const mainQuery = `
-    SELECT ${fields} 
-    FROM ${this.tableName} 
-    LIMIT ${_limit} 
-    OFFSET ${_offset};
-  `;
+      SELECT ${fields} 
+      FROM ${this.tableName} 
+      LIMIT ${_limit} 
+      OFFSET ${_offset};
+    `;
 
     // Raw SQL for the total count
     const countQuery = `
-    SELECT COUNT(*) as count 
-    FROM ${this.tableName};
-  `;
+      SELECT COUNT(*) as count 
+      FROM ${this.tableName};
+    `;
 
     // Execute the main query
     const result = await this.drizzleService.drizzle.execute(mainQuery);
@@ -89,6 +90,64 @@ export abstract class BaseDatabaseService<DOMAIN_MODEL_TYPE> {
         totalPages: Math.ceil(totalCount / _limit),
       },
     };
+  }
+
+  /**
+   * Finds rows in the database based on the provided filter criteria.
+   * @param payload
+   */
+  async findRows(payload: IPersistentFilterPayload) {
+    if (payload.filters.length === 0) {
+      throw new Error('At least one filter must be provided.');
+    }
+
+    // Build the WHERE clause with the specified logical operator
+    const whereClauses = payload.filters.map(
+      (filter, index) => `"${filter.key}" ${filter.operator} '${filter.value}'`,
+    );
+    const whereClause = whereClauses.join(
+      ` ${payload.logicalOperator || 'and'} `,
+    );
+
+    const columns = payload.columns?.join(', ') || '*';
+
+    // Construct the SQL query
+    const query = `
+      SELECT ${columns}
+      FROM ${this.tableName}
+      WHERE ${whereClause};
+    `;
+
+    const result = await this.drizzleService.drizzle.execute(query);
+    return result.rows as DOMAIN_MODEL_TYPE[];
+  }
+
+  /**
+   * Finds the count of rows in the database based on the provided filter criteria.
+   * @param payload
+   */
+  async findRowCount(payload: IPersistentFilterPayload): Promise<number> {
+    if (payload.filters.length === 0) {
+      throw new Error('At least one filter must be provided.');
+    }
+
+    // Build the WHERE clause with the specified logical operator
+    const whereClauses = payload.filters.map(
+      (filter, index) => `"${filter.key}" ${filter.operator} '${filter.value}'`,
+    );
+    const whereClause = whereClauses.join(
+      ` ${payload.logicalOperator || 'and'} `,
+    );
+
+    // Construct the SQL query
+    const query = `
+      SELECT COUNT(*)
+      FROM ${this.tableName}
+      WHERE ${whereClause};
+    `;
+
+    const result = await this.drizzleService.drizzle.execute(query);
+    return result.rows[0].count as number;
   }
 
   /**

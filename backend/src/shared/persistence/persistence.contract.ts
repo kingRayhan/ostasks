@@ -29,3 +29,26 @@ export interface IPagination {
   sort?: ISortType;
   sortBy?: string;
 }
+
+//------------------------------------
+// Find
+//------------------------------------
+export interface IPersistentFilterPayload {
+  filters: Array<{
+    key: string;
+    value: any;
+    operator:
+      | '='
+      | '<'
+      | '>'
+      | '<='
+      | '>='
+      | '<>'
+      | 'like'
+      | 'ilike'
+      | 'in'
+      | 'not in';
+  }>;
+  columns?: string[];
+  logicalOperator?: 'and' | 'or';
+}

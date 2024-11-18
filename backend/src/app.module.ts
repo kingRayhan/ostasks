@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ProjectModule } from './api/project/project.module';
 import { PersistenceModule } from './shared/persistence/persistence.module';
+import { UserModule } from './api/user/user.module';
 
 @Module({
   imports: [
@@ -13,10 +14,8 @@ import { PersistenceModule } from './shared/persistence/persistence.module';
       playground: true,
       autoSchemaFile: true,
     }),
-    ProjectModule,
-    PersistenceModule,
+    // ProjectModule,
+    UserModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------
 // ------   Users
 //--------------------------------------------------------------------------------
-import { pgTable, uuid, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 import { commonTimestampColumns } from './common.schema';
 import { userProjectPivotTable } from './user-project-pivot.schema';
 import { relations } from 'drizzle-orm';
@@ -12,6 +12,7 @@ export const userTable = pgTable('users', {
   avatar: varchar({ length: 255 }),
   username: varchar({ length: 255 }).notNull(),
   password: varchar({ length: 255 }).notNull(),
+  emailVerifiedAt: timestamp(),
   ...commonTimestampColumns,
 });
 export type User = typeof userTable.$inferSelect;
