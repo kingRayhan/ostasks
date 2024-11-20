@@ -40,7 +40,10 @@ export class UserService {
           ],
         },
       ],
-      columns: ['id', 'email', 'username', 'password'],
+      columns: ['email', 'username', 'password'],
+      orderBy: [{ key: 'id', direction: 'asc' }],
+      limit: 1,
+      offset: 0,
     });
 
     if (filteredUsers.length === 0) {

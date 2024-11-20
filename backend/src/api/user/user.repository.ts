@@ -9,4 +9,12 @@ export class UserRepository extends PersistentRepository<User> {
   constructor(drizzleService: DrizzleService) {
     super(drizzleService, DatabaseTableName.users);
   }
+
+  test() {
+    // this.executeSQL('SELECT * FROM users WHERE email = $1', ['test@test.com']);
+
+    this.createOne({
+      email: 'xx',
+    });
+  }
 }

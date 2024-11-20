@@ -78,7 +78,7 @@ export abstract class PersistentRepository<DOMAIN_MODEL_TYPE> {
 
     console.log('columns', columns);
     const { whereClause, values } = buildWhereClause(payload.filters);
-    let orderByClause = buildOrderByClause(payload.orderBy);
+    const orderByClause = buildOrderByClause(payload.orderBy);
 
     // Build the SQL query with LIMIT, OFFSET, and ORDER BY
     const limit = payload.limit ?? 10; // Default limit to 10 if not provided
@@ -89,7 +89,7 @@ export abstract class PersistentRepository<DOMAIN_MODEL_TYPE> {
       SELECT ${columns}
       FROM ${this.tableName}
       ${whereClause ? `WHERE ${whereClause}` : ''}
-      ${orderByClause ? `ORDER BY ${orderByClause}` : ''}
+      ${orderByClause ? orderByClause : ''}
       ${limit ? `LIMIT ${limit}` : ''} ${offset ? `OFFSET ${offset}` : ''};
     `;
 
