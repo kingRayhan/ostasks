@@ -1,12 +1,11 @@
-import { DrizzleService } from '@/shared/persistence/drizzle/drizzle.service';
 import {
   DatabaseTableName,
   drizzleSchemaTableMap,
 } from '@/shared/persistence/drizzle/schemas';
-import { eq } from 'drizzle-orm';
 import {
   AppPaginationResponseDto,
   IPagination,
+  IPersistentDriver,
   IPersistentFilterPayload,
 } from '@/shared/persistence/persistence.contract';
 import {
@@ -24,8 +23,8 @@ import {
  */
 export abstract class PersistentRepository<DOMAIN_MODEL_TYPE> {
   protected constructor(
-    public readonly drizzleService: DrizzleService,
     public readonly tableName: DatabaseTableName,
+    public readonly persistentDriver: IPersistentDriver<DOMAIN_MODEL_TYPE>,
   ) {}
 
   async findAllWithPagination(
@@ -51,9 +50,11 @@ export abstract class PersistentRepository<DOMAIN_MODEL_TYPE> {
     });
 
     // Execute the count query
-    const totalCountResult =
-      await this.drizzleService.drizzle.execute(countQuery);
-    const totalCount = (totalCountResult.rows[0].count as number) || 0;
+    const totalCountResult = await this.persistentDriver.executeSQL(
+      countQuery,
+      [],
+    );
+    const totalCount = 0;
 
     return {
       nodes: nodes as DOMAIN_MODEL_TYPE[],
@@ -94,7 +95,7 @@ export abstract class PersistentRepository<DOMAIN_MODEL_TYPE> {
     `;
 
     // Execute the SQL query
-    const result = await this.executeSQL(sqlQuery, values);
+    const result = await this.persistentDriver.executeSQL(sqlQuery, values);
     return result.rows as DOMAIN_MODEL_TYPE[];
   }
 
@@ -139,49 +140,66 @@ export abstract class PersistentRepository<DOMAIN_MODEL_TYPE> {
   async createOne(
     data: Partial<DOMAIN_MODEL_TYPE>,
   ): Promise<DOMAIN_MODEL_TYPE> {
-    const result = await this.drizzleService.drizzle
-      .insert(drizzleSchemaTableMap[this.tableName])
-      .values(data as any)
-      .returning();
+    // Prepare columns and placeholders for the insert statement
+    const columns = Object.keys(data)
+      .map((key) => `"${key}"`)
+      .join(', ');
+    const placeholders = Object.keys(data)
+      .map((_, index) => `$${index + 1}`)
+      .join(', ');
+    const values = Object.values(data) as any[];
 
-    return result[0] as DOMAIN_MODEL_TYPE;
+    // Build the SQL query
+    const sql = `
+      INSERT INTO ${this.tableName} (${columns})
+      VALUES (${placeholders})
+      RETURNING *;
+    `;
+
+    // Execute the SQL query
+    const result = await this.executeSQL(sql, values);
+    return result.rows[0] as DOMAIN_MODEL_TYPE;
   }
 
   /**
    * Creates multiple records in the database.
    *
-   * @param data
+   * @param payload
    */
   async createMany(
-    data: Partial<DOMAIN_MODEL_TYPE>[],
+    payload: Partial<DOMAIN_MODEL_TYPE>[],
   ): Promise<DOMAIN_MODEL_TYPE[]> {
-    const result = await this.drizzleService.drizzle
-      .insert(drizzleSchemaTableMap[this.tableName])
-      .values(data)
-      .returning();
+    const results = [];
 
-    return result as DOMAIN_MODEL_TYPE[];
+    for (const data of payload) {
+      results.push(await this.createOne(data));
+    }
+    return results as DOMAIN_MODEL_TYPE[];
   }
 
-  async deleteOne(id: string): Promise<DOMAIN_MODEL_TYPE> {
-    const result = await this.drizzleService.drizzle
-      .delete(drizzleSchemaTableMap[this.tableName])
-      .where(eq(drizzleSchemaTableMap[this.tableName].id, id))
-      .returning();
-    return result[0] as DOMAIN_MODEL_TYPE;
-  }
+  // async deleteOne(id: string): Promise<DOMAIN_MODEL_TYPE> {
+  //   // const result = await this.persistentDatabaseDriverService.drizzle
+  //   //   .delete(drizzleSchemaTableMap[this.tableName])
+  //   //   .where(eq(drizzleSchemaTableMap[this.tableName].id, id))
+  //   //   .returning();
+  //   // return result[0] as DOMAIN_MODEL_TYPE;
+  //
+  //   return [];
+  // }
 
-  async updateOne(
-    id: string,
-    data: Partial<DOMAIN_MODEL_TYPE>,
-  ): Promise<DOMAIN_MODEL_TYPE> {
-    const result = await this.drizzleService.drizzle
-      .update(drizzleSchemaTableMap[this.tableName])
-      .set(data)
-      .where(eq(drizzleSchemaTableMap[this.tableName].id, id))
-      .returning();
-    return result[0] as DOMAIN_MODEL_TYPE;
-  }
+  // async updateOne(
+  //   id: string,
+  //   data: Partial<DOMAIN_MODEL_TYPE>,
+  // ): Promise<DOMAIN_MODEL_TYPE> {
+  //   // const result = await this.persistentDatabaseDriverService.drizzle
+  //   //   .update(drizzleSchemaTableMap[this.tableName])
+  //   //   .set(data)
+  //   //   .where(eq(drizzleSchemaTableMap[this.tableName].id, id))
+  //   //   .returning();
+  //   // return result[0] as DOMAIN_MODEL_TYPE;
+  //
+  //   return {};
+  // }
 
   //------------------------------------
   // Utils
@@ -198,24 +216,7 @@ export abstract class PersistentRepository<DOMAIN_MODEL_TYPE> {
    * @param sql
    * @param values
    */
-  executeSQL(sql: string, values: any[]) {
-    function buildSafeQuery(sql: string, values: any[]): string {
-      return sql.replace(/\$(\d+)/g, (_, index) => {
-        const value = values[parseInt(index, 10) - 1];
-        return escapeValue(value);
-      });
-    }
-
-    // Escapes a single value safely
-    function escapeValue(value: any): string {
-      if (value === null) return 'NULL';
-      if (typeof value === 'number') return value.toString();
-      if (typeof value === 'boolean') return value ? 'TRUE' : 'FALSE';
-      if (typeof value === 'string') return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
-      throw new Error(`Unsupported value type: ${typeof value}`);
-    }
-
-    const safeSql = buildSafeQuery(sql, values);
-    return this.drizzleService.drizzle.execute(safeSql);
+  executeSQL(sql: string, values: DOMAIN_MODEL_TYPE[]) {
+    return this.persistentDriver.executeSQL(sql, values);
   }
 }

@@ -66,3 +66,16 @@ export interface IPersistentFilterPayload<T> {
   limit?: number;
   offset?: number;
 }
+
+//------------------------------------
+// Driver
+//------------------------------------
+
+export interface IPersistentDriver<DOMAIN_MODEL> {
+  executeSQL(
+    sql: string,
+    values: Array<any>,
+  ): Promise<{
+    rows: Array<DOMAIN_MODEL>;
+  }>;
+}
