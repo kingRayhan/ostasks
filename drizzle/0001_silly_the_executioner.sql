@@ -1,0 +1,1 @@
+ALTER TABLE "comments" ALTER COLUMN "created_by_id" SET DATA TYPE uuid;

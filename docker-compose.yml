@@ -1,6 +1,0 @@
-services:
-  ostasks:
-    build: .
-    ports:
-      - "3000:3000" # Frontend
-      - "4000:4000" # Backend
