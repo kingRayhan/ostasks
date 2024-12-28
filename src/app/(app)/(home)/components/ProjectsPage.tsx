@@ -49,22 +49,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { appFormatDate } from "@/lib/utils";
+import { createProject } from "./actions";
 
 interface ProjectsPageProps {
   initialProjects: Project[];
 }
 
 const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  // const [searchTerm, setSearchTerm] = useState("");
+  // const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
-  const [itemToBeDeleted, setItemTobeDeleted] = useState<Project | null>(null);
+  // const [itemToBeDeleted, setItemTobeDeleted] = useState<Project | null>(null);
 
   const projectsQuery = useQuery({
-    queryKey: ["projects", searchTerm, statusFilter],
+    queryKey: ["projects"],
     queryFn: async (): Promise<PaginatedResponse<Project>> => {
-      const response = await fetch("/api/projects?search=" + searchTerm);
+      const response = await fetch("/api/projects");
       return response.json();
     },
     initialData: {
@@ -84,7 +85,13 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
           <h1 className="text-3xl font-bold">Projects</h1>
 
           <ProjectFormDrawer
-            onProjectCreate={(project) => alert(JSON.stringify(project))}
+            onProjectCreate={async (project) => {
+              await createProject({
+                title: project.title,
+                description: project.description || "",
+                status: project.status as "active" | "on-hold" | "completed",
+              });
+            }}
           />
         </div>
 
@@ -141,7 +148,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {projectsQuery.data?.items.map((project) => (
+              {projectsQuery.data?.items?.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">
                     <Link href={`/${project.id}`}>{project.title}</Link>
@@ -185,7 +192,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
           </Table>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projectsQuery.data.items?.map((project) => (
+            {projectsQuery?.data?.items?.map((project) => (
               <Card key={project.id}>
                 <CardHeader>
                   <CardTitle>
@@ -237,7 +244,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
       </main>
 
       {/* Modals */}
-      <AlertDialog
+      {/* <AlertDialog
         open={!!itemToBeDeleted}
         onOpenChange={() => setItemTobeDeleted(null)}
       >
@@ -263,7 +270,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </>
   );
 };

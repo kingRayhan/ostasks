@@ -1176,6 +1176,9 @@ video {
 .text-card-foreground {
   color: hsl(var(--card-foreground));
 }
+.text-destructive {
+  color: hsl(var(--destructive));
+}
 .text-destructive-foreground {
   color: hsl(var(--destructive-foreground));
 }

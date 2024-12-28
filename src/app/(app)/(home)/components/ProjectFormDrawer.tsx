@@ -1,3 +1,11 @@
+import { Plus } from "lucide-react";
+import { useRef } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { ErrorMessage } from "@hookform/error-message";
+import * as yup from "yup";
+import { InferType } from "yup";
+// ---
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,30 +27,27 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
-import { SubmitHandler, useForm } from "react-hook-form";
-
-type TForm = {
-  title: string;
-  description: string;
-  status: "active" | "on-hold" | "completed";
-};
 
 type CreateProjectDrawerProps = {
   onProjectCreate: (project: TForm) => void;
 };
 
 function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
-  const form = useForm<TForm>({
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  const form = useForm({
     defaultValues: {
       title: "",
       description: "",
       status: "active",
     },
+    resolver: yupResolver(validationSchema),
   });
 
   const handleSubmit: SubmitHandler<TForm> = (data) => {
     onProjectCreate(data);
+    closeRef.current?.click();
+    form.reset();
   };
 
   return (
@@ -68,8 +73,14 @@ function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
             <Input
               id="project-name"
               placeholder="Enter project name"
-              required
               {...form.register("title")}
+            />
+            <ErrorMessage
+              errors={form.formState.errors}
+              name="title"
+              render={({ message }) => (
+                <p className="text-destructive text-sm">{message}</p>
+              )}
             />
           </div>
           <div className="space-y-1">
@@ -77,14 +88,13 @@ function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
             <Textarea
               id="project-description"
               placeholder="Enter project description"
-              required
               {...form.register("description")}
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="project-status">Status</Label>
             <Select
-              value={form.watch("status")}
+              value={form.watch("status") as "active" | "on-hold" | "completed"}
               onValueChange={(value: "active" | "on-hold" | "completed") =>
                 form.setValue("status", value)
               }
@@ -93,16 +103,15 @@ function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
                 <SelectValue placeholder="Select project status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="On Hold">On Hold</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="on-hold">On Hold</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <SheetFooter>
-            <SheetClose asChild>
-              <Button type="submit">Create Project</Button>
-            </SheetClose>
+            <SheetClose ref={closeRef} />
+            <Button type="submit">Create Project</Button>
           </SheetFooter>
         </form>
       </SheetContent>
@@ -111,3 +120,11 @@ function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
 }
 
 export default ProjectFormDrawer;
+
+const validationSchema = yup.object({
+  title: yup.string().required().label("Project name"),
+  description: yup.string().nullable().optional().label("Description"),
+  status: yup.string().nullable().optional().label("Status"),
+});
+
+type TForm = InferType<typeof validationSchema>;

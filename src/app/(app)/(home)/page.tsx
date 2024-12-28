@@ -11,6 +11,8 @@ const getProjects = async () => {
     columns: {
       id: true,
       title: true,
+      description: true,
+      status: true,
       createdAt: true,
       updatedAt: true,
     },
