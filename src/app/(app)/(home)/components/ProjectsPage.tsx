@@ -1,20 +1,21 @@
 "use client";
 
-import { projects, Project } from "@/backend/persistence/schema";
-import { PaginatedResponse } from "@/lib/models/app.model";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import ProjectFormDrawer from "./ProjectFormDrawer";
+import { Project } from "@/backend/persistence/schema";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -23,33 +24,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { LayoutGrid, List, MoreHorizontal, Search } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { PaginatedResponse } from "@/lib/models/app.model";
 import { appFormatDate } from "@/lib/utils";
-import { createProject } from "./actions";
+import { useQuery } from "@tanstack/react-query";
+import { LayoutGrid, List, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { createProject } from "@/app/actions/projects.action";
+import ProjectFormDrawer from "./ProjectFormDrawer";
 
 interface ProjectsPageProps {
   initialProjects: Project[];
