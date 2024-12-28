@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -20,42 +18,31 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
-type Project = {
-  id: string;
-  name: string;
+type TForm = {
+  title: string;
   description: string;
-  status: "Active" | "On Hold" | "Completed";
-  issues: number;
-  lastUpdated: string;
+  status: "active" | "on-hold" | "completed";
 };
 
 type CreateProjectDrawerProps = {
-  onProjectCreate: (project: Project) => void;
+  onProjectCreate: (project: TForm) => void;
 };
 
 function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<"Active" | "On Hold" | "Completed">(
-    "Active"
-  );
+  const form = useForm<TForm>({
+    defaultValues: {
+      title: "",
+      description: "",
+      status: "active",
+    },
+  });
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    const newProject: Project = {
-      id: Date.now().toString(),
-      name,
-      description,
-      status,
-      issues: 0,
-      lastUpdated: new Date().toISOString().split("T")[0],
-    };
-    onProjectCreate(newProject);
-    setName("");
-    setDescription("");
-    setStatus("Active");
+  const handleSubmit: SubmitHandler<TForm> = (data) => {
+    onProjectCreate(data);
   };
 
   return (
@@ -72,33 +59,34 @@ function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
             Add a new project to your bug tracker. Fill out the details below.
           </SheetDescription>
         </SheetHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-4 mt-4"
+        >
           <div className="space-y-1">
             <Label htmlFor="project-name">Project Name</Label>
             <Input
               id="project-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               placeholder="Enter project name"
               required
+              {...form.register("title")}
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="project-description">Description</Label>
             <Textarea
               id="project-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter project description"
               required
+              {...form.register("description")}
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="project-status">Status</Label>
             <Select
-              value={status}
-              onValueChange={(value: "Active" | "On Hold" | "Completed") =>
-                setStatus(value)
+              value={form.watch("status")}
+              onValueChange={(value: "active" | "on-hold" | "completed") =>
+                form.setValue("status", value)
               }
             >
               <SelectTrigger id="project-status">

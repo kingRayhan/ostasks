@@ -1,6 +1,6 @@
 {
-  "id": "469678f1-2a85-4d10-9d6f-465e701a8180",
-  "prevId": "1b4eb9f4-6632-417a-83da-95e00894d6f8",
+  "id": "034b25d1-1958-4492-be06-2d6e455dfc52",
+  "prevId": "1576901a-bc72-4fc8-95ae-98903723a122",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -191,12 +191,12 @@
           "primaryKey": false,
           "notNull": false
         },
-        "is_active": {
-          "name": "is_active",
-          "type": "boolean",
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
-          "default": true
+          "notNull": false
         },
         "creator_userid": {
           "name": "creator_userid",

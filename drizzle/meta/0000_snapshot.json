@@ -1,5 +1,5 @@
 {
-  "id": "1b4eb9f4-6632-417a-83da-95e00894d6f8",
+  "id": "1576901a-bc72-4fc8-95ae-98903723a122",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -29,7 +29,7 @@
         },
         "created_by_id": {
           "name": "created_by_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },

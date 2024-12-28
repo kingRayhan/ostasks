@@ -6,6 +6,7 @@ import {
   boolean,
   varchar,
   uuid,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 
 import { relations } from "drizzle-orm";
@@ -27,11 +28,21 @@ export const projects = pgTable("projects", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }),
   description: text("description"),
-  isActive: boolean("is_active").default(true),
+  status: text("status").default("active"),
   creatorUserId: uuid("creator_userid").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+export type Project = typeof projects.$inferSelect;
+
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [projects.creatorUserId],
+    references: [users.id],
+  }),
+  allowedUsers: many(projectsToUsers),
+  items: many(items),
+}));
 
 export const projectsToUsers = pgTable("projects_to_users", {
   projectId: uuid("project_id").references(() => projects.id),
@@ -58,21 +69,12 @@ export const comments = pgTable("comments", {
 });
 
 // Define relations
-export const usersRelations = relations(users, ({ many }) => ({
-  projects: many(projectsToUsers),
-  createdProjects: many(projects, {
-    relationName: "created_projects",
-  }),
-}));
-
-export const projectsRelations = relations(projects, ({ one, many }) => ({
-  creator: one(users, {
-    fields: [projects.creatorUserId],
-    references: [users.id],
-  }),
-  allowedUsers: many(projectsToUsers),
-  items: many(items),
-}));
+// export const usersRelations = relations(users, ({ many }) => ({
+//   projects: many(projectsToUsers),
+//   createdProjects: many(projects, {
+//     relationName: "created_projects",
+//   }),
+// }));
 
 export const itemsRelations = relations(items, ({ one, many }) => ({
   project: one(projects, {
