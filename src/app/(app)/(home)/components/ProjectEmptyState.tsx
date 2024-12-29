@@ -7,9 +7,9 @@ const ProjectEmptyState = () => (
       Get started by creating a new project.
     </p>
     <div className="mt-6">
-      <ProjectFormDrawer
+      {/* <ProjectFormDrawer
         onProjectCreate={() => alert("Project created")}
-      ></ProjectFormDrawer>
+      ></ProjectFormDrawer> */}
     </div>
   </div>
 );
