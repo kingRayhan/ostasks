@@ -42,12 +42,38 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { PaginationWrapper } from "@/components/PaginationWrapper";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { queryClient } from "@/common/config/query-client";
 
 interface ProjectsPageProps {
-  initialProjects: Project[];
+  hydratedPaginatedProjects: PaginatedResponse<Project>;
 }
 
-const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
+const ProjectsPage: React.FC<ProjectsPageProps> = ({
+  hydratedPaginatedProjects,
+}) => {
+  const searchParams = useSearchParams();
+  const [page, setPage] = useState(hydratedPaginatedProjects?.meta?.page || 1);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const navigateToPage = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    setPage(page);
+    params.set("page", page.toString());
+    window.history.pushState(null, "", `?${params.toString()}`);
+  };
+
   // const [searchTerm, setSearchTerm] = useState("");
   // const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
@@ -55,19 +81,15 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
   const [itemToBeDeleted, setItemTobeDeleted] = useState<Project | null>(null);
 
   const projectsQuery = useQuery({
-    queryKey: ["projects"],
+    queryKey: ["projects", page],
     queryFn: async (): Promise<PaginatedResponse<Project>> => {
-      const response = await fetch("/api/projects");
+      const qs = new URLSearchParams();
+      qs.set("limit", hydratedPaginatedProjects.meta.limit.toString());
+      qs.set("page", page.toString());
+      const response = await fetch(`/api/projects?${qs.toString()}`);
       return response.json();
     },
-    initialData: {
-      items: initialProjects,
-      meta: {
-        limit: 10,
-        page: 1,
-        total: 10,
-      },
-    },
+    placeholderData: hydratedPaginatedProjects,
   });
 
   return (
@@ -140,7 +162,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {projectsQuery.data?.items?.map((project) => (
+              {projectsQuery?.data?.items?.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">
                     <Link href={`/${project.id}`}>{project.title}</Link>
@@ -233,6 +255,16 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
             ))}
           </div>
         )}
+
+        <PaginationWrapper
+          totalItems={hydratedPaginatedProjects?.meta?.total}
+          itemsPerPage={hydratedPaginatedProjects?.meta?.limit || 10}
+          initialPage={hydratedPaginatedProjects?.meta?.page || 1}
+          onPageChange={navigateToPage}
+        />
+
+        {/* <button onClick={() => navigateToPage(page - 1)}>Prev</button>
+        <button onClick={() => navigateToPage(page + 1)}>Next</button> */}
       </main>
 
       {/* Modals */}
@@ -256,6 +288,9 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
               className="bg-destructive text-destructive-foreground"
               onClick={async () => {
                 await deleteProject(itemToBeDeleted?.id as string);
+                await queryClient.invalidateQueries({
+                  queryKey: ["projects"],
+                });
               }}
             >
               Delete

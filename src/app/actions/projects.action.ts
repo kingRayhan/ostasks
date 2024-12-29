@@ -27,7 +27,6 @@ export const createProject = async (input: CreateProjectInput) => {
       creatorUserId: session?.userId,
     });
 
-    revalidateTag("projects");
     revalidatePath("/");
     return { success: true };
   } catch (error) {
