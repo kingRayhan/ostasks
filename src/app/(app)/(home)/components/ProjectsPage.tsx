@@ -30,8 +30,18 @@ import { useQuery } from "@tanstack/react-query";
 import { LayoutGrid, List, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { createProject } from "@/app/actions/projects.action";
+import { createProject, deleteProject } from "@/app/actions/projects.action";
 import ProjectFormDrawer from "./ProjectFormDrawer";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ProjectsPageProps {
   initialProjects: Project[];
@@ -42,7 +52,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
   // const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
-  // const [itemToBeDeleted, setItemTobeDeleted] = useState<Project | null>(null);
+  const [itemToBeDeleted, setItemTobeDeleted] = useState<Project | null>(null);
 
   const projectsQuery = useQuery({
     queryKey: ["projects"],
@@ -160,11 +170,11 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>View project</DropdownMenuItem>
                         <DropdownMenuItem>Edit project</DropdownMenuItem>
-                        {/* <DropdownMenuItem
+                        <DropdownMenuItem
                           onClick={() => setItemTobeDeleted(project)}
                         >
                           Delete project
-                        </DropdownMenuItem> */}
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -210,11 +220,11 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>View project</DropdownMenuItem>
                         <DropdownMenuItem>Edit project</DropdownMenuItem>
-                        {/* <DropdownMenuItem
+                        <DropdownMenuItem
                           onClick={() => setItemTobeDeleted(project)}
                         >
                           Delete project
-                        </DropdownMenuItem> */}
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -226,7 +236,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
       </main>
 
       {/* Modals */}
-      {/* <AlertDialog
+      <AlertDialog
         open={!!itemToBeDeleted}
         onOpenChange={() => setItemTobeDeleted(null)}
       >
@@ -244,15 +254,15 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ initialProjects }) => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground"
-              onClick={() => {
-                alert("Project deleted");
+              onClick={async () => {
+                await deleteProject(itemToBeDeleted?.id as string);
               }}
             >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog> */}
+      </AlertDialog>
     </>
   );
 };
