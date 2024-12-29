@@ -46,7 +46,6 @@ function ProjectFormDrawer({
   prePopulatedProject,
 }: CreateProjectDrawerProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  const { pending } = useFormStatus();
 
   const form = useForm({
     defaultValues: {

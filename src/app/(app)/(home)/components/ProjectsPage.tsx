@@ -315,6 +315,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
       <ProjectFormDrawer
         isOpen={drawerOpened}
         prePopulatedProject={itemTobeEdited}
+        onClose={drawerHandler.close}
         onSave={async (project) => {
           if (itemTobeEdited) {
             updateProject({
