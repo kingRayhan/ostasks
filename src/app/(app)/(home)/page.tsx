@@ -67,7 +67,7 @@ const page: NextPage<ProjectsPageProps> = async (props) => {
   const query = await props.searchParams;
   const ssrPaginatedProjects = await getProjectsFromDatabase(
     +query?.page || 1,
-    5
+    9
   );
 
   return (

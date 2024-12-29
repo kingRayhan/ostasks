@@ -9,13 +9,13 @@ import { eq } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 // Define the input type separately from the database type
-type CreateProjectInput = {
+type TProjectInput = {
   title: string;
   description?: string;
   status: "active" | "on-hold" | "completed";
 };
 
-export const createProject = async (input: CreateProjectInput) => {
+export const createProject = async (input: TProjectInput) => {
   try {
     const session = await getAuthSession();
     if (!session?.userId) throw new Error("Unauthorized");
@@ -28,7 +28,7 @@ export const createProject = async (input: CreateProjectInput) => {
     });
 
     revalidatePath("/");
-    return { success: true };
+    return { success: true, error: null };
   } catch (error) {
     console.error("Failed to create project:", error);
     return { success: false, error: "Failed to create project" };
@@ -48,5 +48,26 @@ export const deleteProject = async (projectId: string) => {
   } catch (error) {
     console.error("Failed to delete project:", error);
     return { success: false, error: "Failed to delete project" };
+  }
+};
+
+export const updateProject = async (data: {
+  projectId: string;
+  payload: TProjectInput;
+}) => {
+  try {
+    const session = await getAuthSession();
+    if (!session?.userId) throw new Error("Unauthorized");
+
+    await db
+      .update(projects)
+      .set(data.payload)
+      .where(eq(projects.id, data.projectId));
+
+    revalidatePath("/");
+    return { success: true, error: null };
+  } catch (error) {
+    console.error("Failed to update project:", error);
+    return { success: false, error: "Failed to update project" };
   }
 };

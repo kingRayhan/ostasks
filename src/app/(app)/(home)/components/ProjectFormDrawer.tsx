@@ -1,5 +1,5 @@
-import { Plus } from "lucide-react";
-import { useRef } from "react";
+import { Loader, Plus } from "lucide-react";
+import { useActionState, useEffect, useRef } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import * as yup from "yup";
@@ -27,13 +27,26 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { Project } from "@/backend/persistence/schema";
+import { useFormStatus } from "react-dom";
 
 type CreateProjectDrawerProps = {
-  onProjectCreate: (project: TForm) => void;
+  onSave: (project: TForm) => void;
+  prePopulatedProject?: Project | null;
+  isOpen?: boolean;
+  isLoading?: boolean;
+  onClose?: () => void;
 };
 
-function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
+function ProjectFormDrawer({
+  onSave,
+  isOpen,
+  isLoading,
+  onClose,
+  prePopulatedProject,
+}: CreateProjectDrawerProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const { pending } = useFormStatus();
 
   const form = useForm({
     defaultValues: {
@@ -45,21 +58,31 @@ function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
   });
 
   const handleSubmit: SubmitHandler<TForm> = (data) => {
-    onProjectCreate(data);
-    closeRef.current?.click();
-    form.reset();
+    onSave(data);
+    // closeRef.current?.click();
+    // form.reset();
   };
 
+  useEffect(() => {
+    if (prePopulatedProject) {
+      form.setValue("title", prePopulatedProject?.title || "");
+      form.setValue("description", prePopulatedProject?.description || "");
+      form.setValue("status", prePopulatedProject?.status || "active");
+    }
+  }, [prePopulatedProject]);
+
   return (
-    <Sheet>
-      <SheetTrigger asChild>
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      {/* <SheetTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" /> New Project
         </Button>
-      </SheetTrigger>
+      </SheetTrigger> */}
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Create New Project</SheetTitle>
+          <SheetTitle>
+            {prePopulatedProject ? "Edit Project" : "Create New"}
+          </SheetTitle>
           <SheetDescription>
             Add a new project to your bug tracker. Fill out the details below.
           </SheetDescription>
@@ -111,7 +134,10 @@ function ProjectFormDrawer({ onProjectCreate }: CreateProjectDrawerProps) {
           </div>
           <SheetFooter>
             <SheetClose ref={closeRef} />
-            <Button type="submit">Create Project</Button>
+            <Button type="submit">
+              {/* {pending ? <Loader className="animate-spin h-2" /> : null} */}
+              Save
+            </Button>
           </SheetFooter>
         </form>
       </SheetContent>

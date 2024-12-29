@@ -2,7 +2,7 @@
 
 import { db } from "@/backend/persistence/db";
 import { projects } from "@/backend/persistence/schema";
-import { and, asc, desc, eq, like, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getAuthSession } from "../api-utils";
 
@@ -14,6 +14,7 @@ export const GET = async (request: Request) => {
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "10");
   const search = searchParams.get("search") || "";
+  const status = searchParams.get("status") || "all";
   const sort = searchParams.get("sort") || "createdAt";
   const order = searchParams.get("order") || "desc";
 
@@ -30,10 +31,14 @@ export const GET = async (request: Request) => {
   if (search) {
     whereConditions.push(
       or(
-        like(projects.title, `%${search}%`),
-        like(projects.description, `%${search}%`)
+        ilike(projects.title, `%${search}%`),
+        ilike(projects.description, `%${search}%`)
       )
     );
+  }
+
+  if (status !== "all") {
+    whereConditions.push(eq(projects.status, status));
   }
 
   // Calculate offset for pagination
