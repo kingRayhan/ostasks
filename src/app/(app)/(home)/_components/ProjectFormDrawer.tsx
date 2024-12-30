@@ -70,7 +70,13 @@ function ProjectFormDrawer({
   }, [prePopulatedProject]);
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={() => {
+        onClose?.();
+        form.reset();
+      }}
+    >
       {/* <SheetTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" /> New Project

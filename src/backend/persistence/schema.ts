@@ -49,10 +49,22 @@ export const projectsToUsers = pgTable("projects_to_users", {
   userId: uuid("user_id").references(() => users.id),
 });
 
+export enum itemType {
+  Bug = "bug",
+  Feature = "feature",
+  Improvement = "improvement",
+}
+export enum itemStatus {
+  Todo = "todo",
+  InProgress = "in-progress",
+  InReview = "in-review",
+  Closed = "closed",
+}
 export const items = pgTable("items", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }),
   status: varchar("status", { length: 255 }),
+  type: varchar("type", { length: 255 }),
   body: text("body"),
   projectId: uuid("project_id").references(() => projects.id, {
     onDelete: "cascade",

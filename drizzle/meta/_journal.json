@@ -50,6 +50,13 @@
       "when": 1735538727718,
       "tag": "0006_chilly_sunfire",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1735540584184,
+      "tag": "0007_unique_menace",
+      "breakpoints": true
     }
   ]
 }

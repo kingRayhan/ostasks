@@ -2,24 +2,34 @@
 
 import { db } from "@/backend/persistence/db";
 import { getAuthSession } from "../api/api-utils";
-import { items, Project } from "@/backend/persistence/schema";
+import {
+  items,
+  itemStatus,
+  itemType,
+  Project,
+} from "@/backend/persistence/schema";
 
 export const bootstrapItem = async (projectId: string) => {
   try {
     const session = await getAuthSession();
     if (!session?.userId) throw new Error("Unauthorized");
 
-    const result = await db.insert(items).values({
-      title: "(untitled)",
-      body: "",
-      projectId,
-      creatorUserId: session.userId,
-    });
+    const result = await db
+      .insert(items)
+      .values({
+        title: "(untitled)",
+        body: "",
+        projectId,
+        status: itemStatus.Todo,
+        type: itemType.Bug,
+        creatorUserId: session.userId,
+      })
+      .returning({ id: items.id });
 
     return {
       success: true,
       error: null,
-      itemId: (result.rows[0] as Project).id,
+      itemId: result[0].id,
     };
 
     // await db.insert(items).values({

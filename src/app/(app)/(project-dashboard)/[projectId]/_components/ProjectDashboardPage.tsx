@@ -22,8 +22,8 @@ import {
   SelectValue,
 } from "@radix-ui/react-select";
 import { Loader, Plus, Search, X } from "lucide-react";
+import { redirect } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
-import { bootstrapFormItem } from "../edit/[itemId]/action";
 
 enum ItemStatus {
   Todo,
@@ -44,15 +44,27 @@ const items = [
   { id: 4, name: "Item 4", status: ItemStatus.Closed, createdAt: new Date() },
 ];
 
+interface ProjectItemMatrix {
+  allCount: number;
+  todoCount: number;
+  inProgressCount: number;
+  inReviewCount: number;
+  closedCount: number;
+}
 interface Props {
   projectId: string;
+  matrix: ProjectItemMatrix;
 }
 
-const ProjectDashboardPage: React.FC<Props> = ({ projectId }) => {
-  const [state, bootstrapItemAction, pending] = useActionState(
-    bootstrapFormItem,
-    { projectId }
+const ProjectDashboardPage: React.FC<Props> = ({ projectId, matrix }) => {
+  const [_, bootstrapItemAction, bootstrapItemActionPending] = useActionState(
+    async (pre: any, fd: FormData) => {
+      const result = await bootstrapItem(projectId);
+      redirect(`/${projectId}/${result.itemId}/edit`);
+    },
+    {}
   );
+
   const [open, setOpen] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
@@ -174,8 +186,8 @@ const ProjectDashboardPage: React.FC<Props> = ({ projectId }) => {
             </Sheet>
 
             <form action={bootstrapItemAction}>
-              <Button>
-                {pending ? (
+              <Button disabled={bootstrapItemActionPending}>
+                {bootstrapItemActionPending ? (
                   <Loader className="animate-spin h-2" />
                 ) : (
                   <Plus className="w-4 h-4 mr-2" />
@@ -238,30 +250,30 @@ const ProjectDashboardPage: React.FC<Props> = ({ projectId }) => {
       </div>
 
       {/* Dashbard matrix */}
-      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <Card className="p-4">
           <div className="text-sm font-medium text-muted-foreground">
             Total Issues
           </div>
-          <div className="text-3xl font-bold">12</div>
+          <div className="text-3xl font-bold">{matrix.allCount}</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm font-medium text-muted-foreground">
             In Progress
           </div>
-          <div className="text-3xl font-bold">12</div>
+          <div className="text-3xl font-bold">{matrix.inProgressCount}</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm font-medium text-muted-foreground">
             In Review
           </div>
-          <div className="text-3xl font-bold">12</div>
+          <div className="text-3xl font-bold">{matrix.inReviewCount}</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm font-medium text-muted-foreground">
             Closed
           </div>
-          <div className="text-3xl font-bold">12</div>
+          <div className="text-3xl font-bold">{matrix.closedCount}</div>
         </Card>
       </div>
 
@@ -275,7 +287,7 @@ const ProjectDashboardPage: React.FC<Props> = ({ projectId }) => {
             createdAt={item.createdAt}
           />
         ))}
-      </div> */}
+      </div>
     </main>
   );
 };
