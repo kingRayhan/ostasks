@@ -1,3 +1,8 @@
+import { Bug, Calendar, MoreHorizontal, Rocket, User } from "lucide-react";
+import React from "react";
+import { Button } from "../../../../../components/ui/button";
+import { ItemStatus, ItemType } from "@/backend/persistence/schema";
+import { appFormatDate } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -5,12 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
-import { Bug, Calendar, MoreHorizontal, Rocket, User } from "lucide-react";
-import React from "react";
-import { Button } from "../ui/button";
-import { ItemStatus, ItemType } from "@/backend/persistence/schema";
-import { appFormatDate } from "@/lib/utils";
+} from "@/components/ui/dropdown-menu";
 
 interface AppItemCardProps {
   id: string;

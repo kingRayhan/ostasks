@@ -7,6 +7,7 @@ import {
   varchar,
   uuid,
   pgEnum,
+  integer,
 } from "drizzle-orm/pg-core";
 
 import { relations } from "drizzle-orm";
@@ -66,6 +67,7 @@ export const items = pgTable("items", {
   title: varchar("title", { length: 255 }),
   status: varchar("status", { length: 255 }),
   type: varchar("type", { length: 255 }),
+  serialNumber: integer("serial_number"),
   body: text("body"),
   projectId: uuid("project_id").references(() => projects.id, {
     onDelete: "cascade",
@@ -75,6 +77,30 @@ export const items = pgTable("items", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 export type ProjectItem = typeof items.$inferSelect;
+
+export const itemGroups = pgTable("item_groups", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }),
+  description: text("description"),
+  projectId: uuid("project_id").references(() => projects.id, {
+    onDelete: "cascade",
+  }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+export type ItemGroup = typeof itemGroups.$inferSelect;
+
+// Join Table for Item-Group Relations
+export const itemGroupRelations = pgTable("item_group_relations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  itemId: uuid("item_id").references(() => items.id, {
+    onDelete: "cascade", // Remove relation if the item is deleted
+  }),
+  groupId: uuid("group_id").references(() => itemGroups.id, {
+    onDelete: "cascade", // Remove relation if the group is deleted
+  }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 export const comments = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -92,6 +118,16 @@ export const comments = pgTable("comments", {
 //     relationName: "created_projects",
 //   }),
 // }));
+
+//------------------------------------------------------------------------------
+// Relations
+//------------------------------------------------------------------------------
+export const itemGroupsRelations = relations(itemGroups, ({ one, many }) => ({
+  project: one(projects, {
+    fields: [itemGroups.projectId],
+    references: [projects.id],
+  }),
+}));
 
 export const itemsRelations = relations(items, ({ one, many }) => ({
   project: one(projects, {

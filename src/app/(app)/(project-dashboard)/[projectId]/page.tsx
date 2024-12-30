@@ -1,16 +1,9 @@
-import React from "react";
-import ProjectDashboardPage from "./_components/ProjectDashboardPage";
-import { NextPage } from "next";
 import { getAuthSession } from "@/app/api/api-utils";
 import { db } from "@/backend/persistence/db";
+import { items, ItemStatus } from "@/backend/persistence/schema";
 import { and, desc, eq, sql } from "drizzle-orm";
-import {
-  items,
-  ItemStatus,
-  Project,
-  ProjectItem,
-} from "@/backend/persistence/schema";
-import { PaginatedResponse } from "@/lib/models/app.model";
+import { NextPage } from "next";
+import ProjectDashboardPage from "./_components/ProjectDashboardPage";
 
 interface Props {
   params: Promise<{

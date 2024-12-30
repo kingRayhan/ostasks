@@ -1,8 +1,7 @@
 "use client";
 
 import { bootstrapItem } from "@/app/actions/items.action";
-import { ProjectItem, User } from "@/backend/persistence/schema";
-import AppItemCard from "@/components/custom/AppItemCard";
+import { ProjectItem } from "@/backend/persistence/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -16,17 +15,18 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { PaginatedResponse } from "@/lib/models/app.model";
+import { useQuery } from "@tanstack/react-query";
+import { Loader, Plus, Search, X } from "lucide-react";
+import { redirect } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
+import AppItemCard from "./AppItemCard";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
-import { useQuery } from "@tanstack/react-query";
-import { Loader, Plus, Search, X } from "lucide-react";
-import { redirect } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+} from "@/components/ui/select";
 
 enum ItemStatus {
   Todo,
@@ -120,7 +120,6 @@ const ProjectDashboardPage: React.FC<Props> = ({
 
   return (
     <>
-      <pre>{JSON.stringify(itemQuery.data, null, 2)}</pre>
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="flex flex-col gap-4 mb-8">
           {/* Search and filter */}
