@@ -1,12 +1,8 @@
-import { createProject } from "@/app/actions/projects.action";
 import { getAuthSession } from "@/app/api/api-utils";
 import { db } from "@/backend/persistence/db";
 import { projects } from "@/backend/persistence/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { NextPage } from "next";
-import ClientForm from "./components/ClientForm";
-import MinimalProjectList from "./components/MinimalProjectList";
-import ServerForm from "./components/ServerForm";
 import ProjectsPage from "./components/ProjectsPage";
 
 const getProjectsFromDatabase = async (
