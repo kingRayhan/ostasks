@@ -3,7 +3,7 @@ import { db } from "@/backend/persistence/db";
 import { projects } from "@/backend/persistence/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { NextPage } from "next";
-import ProjectsPage from "./components/ProjectsPage";
+import ProjectsPage from "./_components/ProjectsPage";
 
 const getProjectsFromDatabase = async (
   page: number = 1,
@@ -71,26 +71,6 @@ const page: NextPage<ProjectsPageProps> = async (props) => {
       <ProjectsPage hydratedPaginatedProjects={ssrPaginatedProjects as any} />
     </>
   );
-
-  // return (
-  //   <div className=" max-w-4xl mx-auto px-5">
-  //     <div className="flex flex-col gap-4">
-  //       <ClientForm />
-  //       <ServerForm />
-  //     </div>
-
-  //     <h1 className="font-semibold">Server render</h1>
-  //     <ul>
-  //       {projects.items.map((project) => (
-  //         <li>{project.title}</li>
-  //       ))}
-  //     </ul>
-
-  //     <br />
-
-  //     <MinimalProjectList paginatedProjects={projects as any} />
-  //   </div>
-  // );
 };
 
 export default page;

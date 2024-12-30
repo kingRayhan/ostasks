@@ -28,7 +28,7 @@ export const projects = pgTable("projects", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }),
   description: text("description"),
-  status: text("status").default("active"),
+  status: varchar("status").default("active"),
   creatorUserId: uuid("creator_userid").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -52,9 +52,12 @@ export const projectsToUsers = pgTable("projects_to_users", {
 export const items = pgTable("items", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }),
+  status: varchar("status", { length: 255 }),
   body: text("body"),
-  projectId: uuid("project_id").references(() => projects.id),
-  userId: uuid("creator_userid").references(() => users.id),
+  projectId: uuid("project_id").references(() => projects.id, {
+    onDelete: "cascade",
+  }),
+  creatorUserId: uuid("creator_userid").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -82,7 +85,7 @@ export const itemsRelations = relations(items, ({ one, many }) => ({
     references: [projects.id],
   }),
   creator: one(users, {
-    fields: [items.userId],
+    fields: [items.creatorUserId],
     references: [users.id],
   }),
   comments: many(comments),

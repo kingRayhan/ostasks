@@ -59,6 +59,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import clsx from "clsx";
+import ConfirmationDialog from "@/components/custom/ConfirmationDialog";
 
 const statusBadgeColorMap = {
   active: "bg-green-500",
@@ -296,36 +297,17 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
       </main>
 
       {/* Modals */}
-      <AlertDialog
-        open={!!itemToBeDeleted}
+      <ConfirmationDialog
+        isOpen={!!itemToBeDeleted}
         onOpenChange={() => setItemTobeDeleted(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure you want to delete this project?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              project and all associated data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground"
-              onClick={async () => {
-                await deleteProject(itemToBeDeleted?.id as string);
-                await queryClient.invalidateQueries({
-                  queryKey: ["projects"],
-                });
-              }}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onConfirm={async () => {
+          await deleteProject(itemToBeDeleted?.id as string);
+          await queryClient.invalidateQueries({
+            queryKey: ["projects"],
+          });
+          setItemTobeDeleted(null);
+        }}
+      />
 
       <ProjectFormDrawer
         isOpen={drawerOpened}

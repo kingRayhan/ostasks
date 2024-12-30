@@ -31,17 +31,15 @@ import { Project } from "@/backend/persistence/schema";
 import { useFormStatus } from "react-dom";
 
 type CreateProjectDrawerProps = {
-  onSave: (project: TForm) => void;
+  onSave: (project: TForm) => Promise<void>;
   prePopulatedProject?: Project | null;
   isOpen?: boolean;
-  isLoading?: boolean;
   onClose?: () => void;
 };
 
 function ProjectFormDrawer({
   onSave,
   isOpen,
-  isLoading,
   onClose,
   prePopulatedProject,
 }: CreateProjectDrawerProps) {
@@ -56,10 +54,11 @@ function ProjectFormDrawer({
     resolver: yupResolver(validationSchema),
   });
 
-  const handleSubmit: SubmitHandler<TForm> = (data) => {
-    onSave(data);
+  const handleSubmit: SubmitHandler<TForm> = async (data) => {
+    await onSave(data);
+    form.reset();
+
     // closeRef.current?.click();
-    // form.reset();
   };
 
   useEffect(() => {
@@ -133,8 +132,10 @@ function ProjectFormDrawer({
           </div>
           <SheetFooter>
             <SheetClose ref={closeRef} />
-            <Button type="submit">
-              {/* {pending ? <Loader className="animate-spin h-2" /> : null} */}
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? (
+                <Loader className="animate-spin h-4 w-4 mr-2" />
+              ) : null}
               Save
             </Button>
           </SheetFooter>

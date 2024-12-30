@@ -40,6 +40,8 @@ export const deleteProject = async (projectId: string) => {
     const session = await getAuthSession();
     if (!session?.userId) throw new Error("Unauthorized");
 
+    console.log({ projectId });
+
     await db.delete(projects).where(eq(projects.id, projectId));
 
     revalidateTag("projects");

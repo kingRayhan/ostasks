@@ -36,6 +36,20 @@
       "when": 1735397549783,
       "tag": "0004_closed_pet_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1735532335577,
+      "tag": "0005_familiar_mephisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1735538727718,
+      "tag": "0006_chilly_sunfire",
+      "breakpoints": true
     }
   ]
 }
