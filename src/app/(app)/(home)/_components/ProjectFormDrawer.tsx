@@ -1,11 +1,11 @@
-import { Loader, Plus } from "lucide-react";
-import { useActionState, useEffect, useRef } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
+import { Loader } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { InferType } from "yup";
 // ---
-import { yupResolver } from "@hookform/resolvers/yup";
+import { Project } from "@/backend/persistence/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,11 +24,9 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { Project } from "@/backend/persistence/schema";
-import { useFormStatus } from "react-dom";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type CreateProjectDrawerProps = {
   onSave: (project: TForm) => Promise<void>;

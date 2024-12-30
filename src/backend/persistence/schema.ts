@@ -89,6 +89,7 @@ export const itemGroups = pgTable("item_groups", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 export type ItemGroup = typeof itemGroups.$inferSelect;
+export type ItemGroupInput = typeof itemGroups.$inferInsert;
 
 // Join Table for Item-Group Relations
 export const itemGroupRelations = pgTable("item_group_relations", {
