@@ -3,17 +3,27 @@ import ProjectDashboardPage from "./_components/ProjectDashboardPage";
 import { NextPage } from "next";
 import { getAuthSession } from "@/app/api/api-utils";
 import { db } from "@/backend/persistence/db";
-import { and, eq, sql } from "drizzle-orm";
-import { items, itemStatus } from "@/backend/persistence/schema";
+import { and, desc, eq, sql } from "drizzle-orm";
+import {
+  items,
+  ItemStatus,
+  Project,
+  ProjectItem,
+} from "@/backend/persistence/schema";
+import { PaginatedResponse } from "@/lib/models/app.model";
 
 interface Props {
   params: Promise<{
     projectId: string;
   }>;
+  searchParams: Promise<{
+    page: string;
+  }>;
 }
 
 const getProjectItemMatrixFromDatabase = async (projectId: string) => {
   const authSession = await getAuthSession();
+  if (!authSession?.userId) throw new Error("Unauthorized");
 
   const allCount = await db
     .select({ count: sql<number>`count(*)` })
@@ -25,7 +35,7 @@ const getProjectItemMatrixFromDatabase = async (projectId: string) => {
     .select({ count: sql<number>`count(*)` })
     .from(items)
     .where(
-      and(eq(items.projectId, projectId), eq(items.status, itemStatus.Todo))
+      and(eq(items.projectId, projectId), eq(items.status, ItemStatus.Todo))
     )
     .execute();
 
@@ -35,7 +45,7 @@ const getProjectItemMatrixFromDatabase = async (projectId: string) => {
     .where(
       and(
         eq(items.projectId, projectId),
-        eq(items.status, itemStatus.InProgress)
+        eq(items.status, ItemStatus.InProgress)
       )
     )
     .execute();
@@ -44,7 +54,7 @@ const getProjectItemMatrixFromDatabase = async (projectId: string) => {
     .select({ count: sql<number>`count(*)` })
     .from(items)
     .where(
-      and(eq(items.projectId, projectId), eq(items.status, itemStatus.InReview))
+      and(eq(items.projectId, projectId), eq(items.status, ItemStatus.InReview))
     )
     .execute();
 
@@ -52,7 +62,7 @@ const getProjectItemMatrixFromDatabase = async (projectId: string) => {
     .select({ count: sql<number>`count(*)` })
     .from(items)
     .where(
-      and(eq(items.projectId, projectId), eq(items.status, itemStatus.Closed))
+      and(eq(items.projectId, projectId), eq(items.status, ItemStatus.Closed))
     )
     .execute();
 
@@ -65,13 +75,67 @@ const getProjectItemMatrixFromDatabase = async (projectId: string) => {
   };
 };
 
-const page: NextPage<Props> = async ({ params }) => {
+const getProjectItemsFromDatabase = async (
+  projectId: string,
+  page: number = 1,
+  limit: number = 50
+) => {
+  // const authSession = await getAuthSession();
+  // if (!authSession?.authUserId) throw new Error("Unauthorized");
+  const itemsResult = await db.query.items.findMany({
+    limit,
+    offset: (page - 1) * limit,
+    orderBy: [desc(items.createdAt)],
+    columns: {
+      id: true,
+      title: true,
+      status: true,
+      type: true,
+      createdAt: true,
+    },
+    with: {
+      creator: {
+        columns: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          username: true,
+        },
+      },
+    },
+    where: eq(items.projectId, projectId),
+  });
+
+  const count = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(items)
+    .where(eq(items.projectId, projectId))
+    .execute();
+
+  return {
+    items: itemsResult,
+    meta: {
+      limit,
+      page,
+      total: Number(count[0].count),
+    },
+  };
+};
+
+const page: NextPage<Props> = async ({ params, searchParams }) => {
   const _params = await params;
+  const _searchParams = await searchParams;
+  const itemsResult = await getProjectItemsFromDatabase(
+    _params.projectId,
+    +_searchParams.page || 1,
+    50
+  );
 
   return (
     <ProjectDashboardPage
       projectId={_params.projectId}
       matrix={await getProjectItemMatrixFromDatabase(_params.projectId)}
+      hydratedItems={itemsResult as any}
     />
   );
 };

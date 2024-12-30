@@ -23,6 +23,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+export type User = typeof users.$inferSelect;
 
 export const projects = pgTable("projects", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -49,12 +50,12 @@ export const projectsToUsers = pgTable("projects_to_users", {
   userId: uuid("user_id").references(() => users.id),
 });
 
-export enum itemType {
+export enum ItemType {
   Bug = "bug",
   Feature = "feature",
   Improvement = "improvement",
 }
-export enum itemStatus {
+export enum ItemStatus {
   Todo = "todo",
   InProgress = "in-progress",
   InReview = "in-review",
@@ -73,6 +74,7 @@ export const items = pgTable("items", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+export type ProjectItem = typeof items.$inferSelect;
 
 export const comments = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),

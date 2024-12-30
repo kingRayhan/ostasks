@@ -4,8 +4,8 @@ import { db } from "@/backend/persistence/db";
 import { getAuthSession } from "../api/api-utils";
 import {
   items,
-  itemStatus,
-  itemType,
+  ItemStatus,
+  ItemType,
   Project,
 } from "@/backend/persistence/schema";
 
@@ -20,8 +20,8 @@ export const bootstrapItem = async (projectId: string) => {
         title: "(untitled)",
         body: "",
         projectId,
-        status: itemStatus.Todo,
-        type: itemType.Bug,
+        status: ItemStatus.Todo,
+        type: ItemType.Bug,
         creatorUserId: session.userId,
       })
       .returning({ id: items.id });

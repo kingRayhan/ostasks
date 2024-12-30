@@ -6,40 +6,46 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import { Calendar, MoreHorizontal, User } from "lucide-react";
+import { Bug, Calendar, MoreHorizontal, Rocket, User } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
-
-enum ItemStatus {
-  Todo,
-  InProgress,
-  InReview,
-  Closed,
-}
+import { ItemStatus, ItemType } from "@/backend/persistence/schema";
+import { appFormatDate } from "@/lib/utils";
 
 interface AppItemCardProps {
-  id: number;
+  id: string;
   title: string;
   status: ItemStatus;
+  type: ItemType;
   createdAt: Date;
+  creatorName: string;
 }
 
-const AppItemCard: React.FC<AppItemCardProps> = ({ title, createdAt }) => {
+const AppItemCard: React.FC<AppItemCardProps> = ({
+  title,
+  createdAt,
+  creatorName,
+}) => {
   return (
     <div className="flex flex-col bg-card sm:flex-row sm:items-center justify-between p-4 border rounded-lg">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
-          <div className="w-4 h-4 bg-red-500 rounded" />
-          <span className="font-medium">{title}</span>
+          {/* <div className="w-4 h-4 bg-red-500 rounded" /> */}
+          {/* <Bug className="w-5 h-5 text-red-500" /> */}
+          <Bug className="w-5 h-5 text-red-500" />
+          {/* <Rocket className="w-5 h-5 text-green-500" /> */}
+          {/* <Rocket className="w-5 h-5 text-green-500" /> */}
+
+          <span className="font-medium">123 - {title}</span>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
-            <span>Created: {createdAt.toLocaleDateString()}</span>
+            <span>{appFormatDate(createdAt)}</span>
           </div>
           <div className="flex items-center gap-1">
             <User className="w-4 h-4" />
-            <span>Creator: @johndoe</span>
+            <span>{creatorName}</span>
           </div>
         </div>
       </div>
