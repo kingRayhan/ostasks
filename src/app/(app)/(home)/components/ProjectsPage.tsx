@@ -58,6 +58,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import clsx from "clsx";
+
+const statusBadgeColorMap = {
+  active: "bg-green-500",
+  onHold: "bg-yellow-500",
+  completed: "bg-red-500",
+};
 
 interface ProjectsPageProps {
   hydratedPaginatedProjects: PaginatedResponse<Project>;
@@ -168,22 +175,24 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
                 </TableHeader>
                 <TableBody>
                   {projectsQuery?.data?.items?.map((project) => (
-                    <TableRow key={project.id}>
+                    <TableRow key={project.id} data-project-id={project.id}>
                       <TableCell className="font-medium">
                         <Link href={`/${project.id}`}>{project.title}</Link>
                       </TableCell>
                       <TableCell>124</TableCell>
                       <TableCell>
-                        <Badge
-                          variant={
-                            project.status === "active"
-                              ? "secondary"
-                              : "destructive"
-                          }
-                          className="capitalize"
+                        <label
+                          className={clsx(
+                            "px-2 py-0.5 text-xs text-white font-semibold rounded-sm",
+                            {
+                              "bg-green-500": project.status === "active",
+                              "bg-yellow-500": project.status === "on-hold",
+                              "bg-red-500": project.status === "completed",
+                            }
+                          )}
                         >
                           {project.status}
-                        </Badge>
+                        </label>
                       </TableCell>
                       <TableCell>{appFormatDate(project?.updatedAt)}</TableCell>
                       <TableCell className="text-right">
@@ -219,31 +228,10 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projectsQuery?.data?.items?.map((project) => (
-                  <Card key={project.id}>
+                  <Card key={project.id} data-project-id={project.id}>
                     <CardHeader>
-                      <CardTitle>
+                      <CardTitle className="flex justify-between items-center">
                         <Link href={`/${project.id}`}>{project.title}</Link>
-                      </CardTitle>
-                      <CardDescription>{project.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex justify-between items-center mb-2">
-                        <Badge
-                          variant={
-                            project.status === "active"
-                              ? "secondary"
-                              : "destructive"
-                          }
-                          className="capitalize"
-                        >
-                          {project.status}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          Last updated: {appFormatDate(project?.updatedAt)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        {/* <span>Issues: {project.issues}</span> */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -253,7 +241,14 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem>View project</DropdownMenuItem>
-                            <DropdownMenuItem>Edit project</DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setItemTobeEdited(project);
+                                drawerHandler.open();
+                              }}
+                            >
+                              Edit project
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => setItemTobeDeleted(project)}
                             >
@@ -261,6 +256,26 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
+                      </CardTitle>
+                      <CardDescription>{project.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col items-start gap-2">
+                        <label
+                          className={clsx(
+                            "px-2 py-0.5 text-xs text-white font-semibold rounded-sm",
+                            {
+                              "bg-green-500": project.status === "active",
+                              "bg-yellow-500": project.status === "on-hold",
+                              "bg-red-500": project.status === "completed",
+                            }
+                          )}
+                        >
+                          {project.status}
+                        </label>
+                        <span className="text-sm text-muted-foreground">
+                          Last updated: {appFormatDate(project?.updatedAt)}
+                        </span>
                       </div>
                     </CardContent>
                   </Card>
@@ -318,7 +333,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
         onClose={drawerHandler.close}
         onSave={async (project) => {
           if (itemTobeEdited) {
-            updateProject({
+            await updateProject({
               projectId: itemTobeEdited.id as string,
               payload: {
                 title: project.title,
@@ -333,9 +348,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
               status: project.status as "active" | "on-hold" | "completed",
             });
           }
-
           setItemTobeEdited(null);
-
           await queryClient.invalidateQueries({
             queryKey: ["projects"],
           });
