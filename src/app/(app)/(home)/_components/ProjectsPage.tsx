@@ -45,7 +45,14 @@ import {
 import { PaginatedResponse } from "@/lib/models/app.model";
 import { appFormatDate } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutGrid, List, MoreHorizontal, Plus, Search } from "lucide-react";
+import {
+  LayoutGrid,
+  List,
+  MoreHorizontal,
+  Plus,
+  Search,
+  SquareKanban,
+} from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useActionState, useState } from "react";
@@ -60,6 +67,7 @@ import {
 import { Input } from "@/components/ui/input";
 import clsx from "clsx";
 import ConfirmationDialog from "@/components/custom/ConfirmationDialog";
+import Image from "next/image";
 
 const statusBadgeColorMap = {
   active: "bg-green-500",
@@ -178,7 +186,21 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
                   {projectsQuery?.data?.items?.map((project) => (
                     <TableRow key={project.id} data-project-id={project.id}>
                       <TableCell className="font-medium">
-                        <Link href={`/${project.id}`}>{project.title}</Link>
+                        <div className="flex items-center gap-2">
+                          {project?.logoUrl ? (
+                            <div className="border-2 border-gray-200 rounded-md h-6 w-6 object-cover overflow-hidden">
+                              <Image
+                                src={project?.logoUrl}
+                                alt={project?.title + " logo"}
+                                width={24}
+                                height={24}
+                              />
+                            </div>
+                          ) : (
+                            <SquareKanban className="h-6 w-6" />
+                          )}
+                          <Link href={`/${project.id}`}>{project.title}</Link>
+                        </div>
                       </TableCell>
                       <TableCell>124</TableCell>
                       <TableCell>
@@ -232,7 +254,21 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
                   <Card key={project.id} data-project-id={project.id}>
                     <CardHeader>
                       <CardTitle className="flex justify-between items-center">
-                        <Link href={`/${project.id}`}>{project.title}</Link>
+                        <div className="flex items-center gap-2">
+                          {project?.logoUrl ? (
+                            <div className="border-2 border-gray-200 rounded-md h-[26px] w-[26px] object-cover overflow-hidden">
+                              <Image
+                                src={project?.logoUrl}
+                                alt={project?.title + " logo"}
+                                width={26}
+                                height={26}
+                              />
+                            </div>
+                          ) : (
+                            <SquareKanban className="h-6 w-6" />
+                          )}
+                          <Link href={`/${project.id}`}>{project.title}</Link>
+                        </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">

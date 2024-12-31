@@ -20,6 +20,7 @@ const getProjectsFromDatabase = async (
       id: true,
       title: true,
       description: true,
+      logoUrl: true,
       status: true,
       createdAt: true,
       updatedAt: true,
