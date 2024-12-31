@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 import * as yup from "yup";
 import { InferType } from "yup";
@@ -18,14 +18,36 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ErrorMessage } from "@hookform/error-message";
-import { Loader } from "lucide-react";
+import { Loader, Upload, X } from "lucide-react";
+import useFileUpload from "@/hooks/useFileUpload";
 
 interface GeneralFormProps {
   project: Project;
-  onSave: (project: Project) => Promise<void>;
+  onSave: (project: TForm) => Promise<void>;
 }
 
 const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
+  const [logo, setLogo] = useState<string | null>(project?.logoUrl || null);
+  const { uploadFile } = useFileUpload();
+
+  const handleLogoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogo(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      const url = await uploadFile(file);
+      if (url) {
+        await onSave({ ...project, logoUrl: url } as any);
+      }
+    }
+  };
+
   const form = useForm({
     defaultValues: {
       title: "",
@@ -43,9 +65,16 @@ const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
     }
   }, [project]);
 
+  const handleSubmit: SubmitHandler<TForm> = async (data) => {
+    await onSave(data);
+  };
+
   return (
-    <div className="flex flex-col gap-4 items-start">
-      {/* <div>
+    <form
+      onSubmit={form.handleSubmit(handleSubmit)}
+      className="flex flex-col gap-4"
+    >
+      <div>
         <Label>Project Logo</Label>
         <div className="mt-2 flex items-center gap-4">
           <div className="relative w-24 h-24 border rounded-lg overflow-hidden">
@@ -84,7 +113,7 @@ const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
             </Label>
           </div>
         </div>
-      </div> */}
+      </div>
 
       <div>
         <Label htmlFor="name">Project Name</Label>
@@ -137,13 +166,15 @@ const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
         </Select>
       </div>
 
-      <Button type="submit" disabled={form.formState.isSubmitting}>
-        {form.formState.isSubmitting ? (
-          <Loader className="animate-spin h-4 w-4 mr-2" />
-        ) : null}
-        Save
-      </Button>
-    </div>
+      <div>
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <Loader className="animate-spin h-4 w-4 mr-2" />
+          ) : null}
+          Save
+        </Button>
+      </div>
+    </form>
   );
 };
 
@@ -153,6 +184,7 @@ const validationSchema = yup.object({
   title: yup.string().required().label("Project name"),
   description: yup.string().nullable().optional().label("Description"),
   status: yup.string().nullable().optional().label("Status"),
+  logoUrl: yup.string().nullable().optional().label("Logo URL"),
 });
 
 type TForm = InferType<typeof validationSchema>;

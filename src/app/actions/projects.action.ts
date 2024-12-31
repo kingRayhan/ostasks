@@ -9,11 +9,13 @@ import { eq } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 // Define the input type separately from the database type
-type TProjectInput = {
-  title: string;
-  description?: string;
-  status: "active" | "on-hold" | "completed";
-};
+// type TProjectInput = {
+//   title: string;
+//   description?: string;
+//   status: "active" | "on-hold" | "completed";
+// };
+
+type TProjectInput = typeof projects.$inferInsert;
 
 export const createProject = async (input: TProjectInput) => {
   try {

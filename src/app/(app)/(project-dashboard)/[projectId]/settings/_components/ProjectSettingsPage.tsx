@@ -1,18 +1,15 @@
 "use client";
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+import { updateProject } from "@/app/actions/projects.action";
+import { Project } from "@/backend/persistence/schema";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -21,16 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Upload, X } from "lucide-react";
-import { Project } from "@/backend/persistence/schema";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from "@/components/ui/card";
 import GeneralForm from "./GeneralForm";
 
 interface ProjectSettingPageProps {
@@ -40,19 +27,6 @@ interface ProjectSettingPageProps {
 const ProjectSettingsPage: React.FC<ProjectSettingPageProps> = ({
   project,
 }) => {
-  const [logo, setLogo] = useState<string | null>(null);
-
-  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogo(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
     <main className="flex-grow container mx-auto px-4 py-8">
       <Card>
@@ -71,7 +45,22 @@ const ProjectSettingsPage: React.FC<ProjectSettingPageProps> = ({
             </TabsList>
 
             <TabsContent value="general" className="space-y-6">
-              <GeneralForm project={project} onSave={async (project) => {}} />
+              <GeneralForm
+                project={project}
+                onSave={async (_project) => {
+                  await toast.promise(
+                    updateProject({
+                      projectId: project.id,
+                      payload: { ..._project, logoUrl: _project.logoUrl },
+                    }),
+                    {
+                      loading: "Updating...",
+                      success: "Updated successfully",
+                      error: "Failed to update",
+                    }
+                  );
+                }}
+              />
             </TabsContent>
 
             <TabsContent value="epics" className="space-y-4">

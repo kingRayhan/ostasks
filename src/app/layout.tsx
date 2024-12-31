@@ -1,9 +1,9 @@
+import { Scaffold } from "@/components/scaffold";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import React, { PropsWithChildren } from "react";
 import "./globals.css";
-import { Scaffold } from "@/components/scaffold";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

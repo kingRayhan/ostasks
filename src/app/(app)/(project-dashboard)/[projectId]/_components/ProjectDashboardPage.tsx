@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/sheet";
 import { PaginatedResponse } from "@/lib/models/app.model";
 import { useQuery } from "@tanstack/react-query";
-import { Loader, Plus, Search, X } from "lucide-react";
-import { redirect } from "next/navigation";
+import { Loader, Plus, Search, Settings, X } from "lucide-react";
+import { redirect, usePathname } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import AppItemCard from "./AppItemCard";
 import {
@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 
 enum ItemStatus {
   Todo,
@@ -65,6 +66,7 @@ const ProjectDashboardPage: React.FC<Props> = ({
   matrix,
   hydratedItems,
 }) => {
+  const pathName = usePathname();
   const [_, bootstrapItemAction, bootstrapItemActionPending] = useActionState(
     async (pre: any, fd: FormData) => {
       const result = await bootstrapItem(projectId);
@@ -225,6 +227,12 @@ const ProjectDashboardPage: React.FC<Props> = ({
                   Add New
                 </Button>
               </form>
+
+              <Button variant="outline" asChild size={"icon"}>
+                <Link href={`${pathName}/settings`}>
+                  <Settings className="w-4 h-4" />
+                </Link>
+              </Button>
             </div>
           </div>
           {hasActiveFilters && (

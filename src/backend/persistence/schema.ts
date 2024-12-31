@@ -30,6 +30,7 @@ export const projects = pgTable("projects", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }),
   description: text("description"),
+  logoUrl: varchar("logo_url", { length: 255 }),
   status: varchar("status").default("active"),
   creatorUserId: uuid("creator_userid").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
@@ -37,18 +38,10 @@ export const projects = pgTable("projects", {
 });
 export type Project = typeof projects.$inferSelect;
 
-export const projectsRelations = relations(projects, ({ one, many }) => ({
-  creator: one(users, {
-    fields: [projects.creatorUserId],
-    references: [users.id],
-  }),
-  allowedUsers: many(projectsToUsers),
-  items: many(items),
-}));
-
 export const projectsToUsers = pgTable("projects_to_users", {
   projectId: uuid("project_id").references(() => projects.id),
   userId: uuid("user_id").references(() => users.id),
+  // role: pgEnum("role", ["member"])(),
 });
 
 export enum ItemType {
@@ -123,6 +116,15 @@ export const comments = pgTable("comments", {
 //------------------------------------------------------------------------------
 // Relations
 //------------------------------------------------------------------------------
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [projects.creatorUserId],
+    references: [users.id],
+  }),
+  members: many(projectsToUsers),
+  items: many(items),
+}));
+
 export const itemGroupsRelations = relations(itemGroups, ({ one, many }) => ({
   project: one(projects, {
     fields: [itemGroups.projectId],
