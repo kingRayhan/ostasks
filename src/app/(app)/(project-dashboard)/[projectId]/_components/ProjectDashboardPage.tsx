@@ -1,11 +1,18 @@
 "use client";
 
 import { bootstrapItem } from "@/app/actions/items.action";
-import { ProjectItem } from "@/backend/persistence/schema";
+import { Project, ProjectItem } from "@/backend/persistence/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -16,18 +23,12 @@ import {
 } from "@/components/ui/sheet";
 import { PaginatedResponse } from "@/lib/models/app.model";
 import { useQuery } from "@tanstack/react-query";
-import { Loader, Plus, Search, Settings, X } from "lucide-react";
+import { Loader, Plus, Search, Settings, SquareKanban, X } from "lucide-react";
+import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import AppItemCard from "./AppItemCard";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import Link from "next/link";
+import Image from "next/image";
 
 enum ItemStatus {
   Todo,
@@ -58,11 +59,13 @@ interface ProjectItemMatrix {
 interface Props {
   projectId: string;
   matrix: ProjectItemMatrix;
+  project: Project;
   hydratedItems: PaginatedResponse<ProjectItem>;
 }
 
 const ProjectDashboardPage: React.FC<Props> = ({
   projectId,
+  project,
   matrix,
   hydratedItems,
 }) => {
@@ -126,7 +129,23 @@ const ProjectDashboardPage: React.FC<Props> = ({
         <div className="flex flex-col gap-4 mb-8">
           {/* Search and filter */}
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Dinebd&apos;s issues</h2>
+            <div className="flex items-center gap-2">
+              {project?.logoUrl ? (
+                <div className="border-2 border-gray-200 rounded-md h-10 w-10 object-cover overflow-hidden">
+                  <Image
+                    src={project?.logoUrl}
+                    alt={project?.title + " logo"}
+                    width={40}
+                    height={40}
+                  />
+                </div>
+              ) : (
+                <SquareKanban className="h-10 w-10" />
+              )}
+
+              <h2 className="text-2xl font-semibold">{project.title}</h2>
+            </div>
+
             <div className="flex gap-2">
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>

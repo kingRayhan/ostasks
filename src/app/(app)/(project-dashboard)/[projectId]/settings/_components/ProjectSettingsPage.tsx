@@ -1,6 +1,6 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus } from "lucide-react";
+import { MoveLeft, Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import GeneralForm from "./GeneralForm";
+import Link from "next/link";
 
 interface ProjectSettingPageProps {
   project: Project;
@@ -31,12 +32,16 @@ const ProjectSettingsPage: React.FC<ProjectSettingPageProps> = ({
     <main className="flex-grow container mx-auto px-4 py-8">
       <Card>
         <CardHeader>
-          <h1 className="text-3xl font-bold mb-6">
-            {project.title} project settings
-          </h1>
+          <div className="flex items-center gap-2">
+            <Link href={`/${project.id}`}>
+              <MoveLeft />
+            </Link>
+            <h2 className="text-2xl font-bold">
+              {project.title} project settings
+            </h2>
+          </div>
         </CardHeader>
         <CardContent>
-          <pre>{JSON.stringify(project, null, 2)}</pre>
           <Tabs defaultValue="general" className="w-full">
             <TabsList>
               <TabsTrigger value="general">General</TabsTrigger>

@@ -1,6 +1,6 @@
 import { getAuthSession } from "@/app/api/api-utils";
 import { db } from "@/backend/persistence/db";
-import { items, ItemStatus } from "@/backend/persistence/schema";
+import { items, ItemStatus, projects } from "@/backend/persistence/schema";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { NextPage } from "next";
 import ProjectDashboardPage from "./_components/ProjectDashboardPage";
@@ -115,6 +115,24 @@ const getProjectItemsFromDatabase = async (
   };
 };
 
+const getProjectDetailsFromDatabase = async (projectId: string) => {
+  const authSession = await getAuthSession();
+  if (!authSession?.userId) throw new Error("Unauthorized");
+
+  const result = await db.query.projects.findFirst({
+    where: eq(projects.id, projectId),
+    columns: {
+      id: true,
+      title: true,
+      description: true,
+      logoUrl: true,
+      status: true,
+    },
+  });
+
+  return result;
+};
+
 const page: NextPage<Props> = async ({ params, searchParams }) => {
   const _params = await params;
   const _searchParams = await searchParams;
@@ -127,6 +145,7 @@ const page: NextPage<Props> = async ({ params, searchParams }) => {
   return (
     <ProjectDashboardPage
       projectId={_params.projectId}
+      project={(await getProjectDetailsFromDatabase(_params.projectId)) as any}
       matrix={await getProjectItemMatrixFromDatabase(_params.projectId)}
       hydratedItems={itemsResult as any}
     />
