@@ -53,20 +53,12 @@ const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
 
   const form = useForm({
     defaultValues: {
-      title: "",
-      description: "",
-      status: "active",
+      title: project?.title || "",
+      description: project?.description || "",
+      status: project?.status || "active",
     },
     resolver: yupResolver(validationSchema),
   });
-
-  useEffect(() => {
-    if (project) {
-      form.setValue("title", project?.title || "");
-      form.setValue("description", project?.description || "");
-      form.setValue("status", project?.status || "active");
-    }
-  }, [project]);
 
   const handleSubmit: SubmitHandler<TForm> = async (data) => {
     await onSave(data);
