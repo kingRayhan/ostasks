@@ -103,27 +103,27 @@ const ItemEditorForm: React.FC<Props> = ({ item }) => {
     );
   };
 
-  // useEffect(() => {
-  //   const handlePaste = (event: ClipboardEvent) => {
-  //     const items = event.clipboardData?.items;
-  //     if (items?.length) {
-  //       for (const item of items) {
-  //         if (item.type.startsWith("image/")) {
-  //           const file = item.getAsFile();
-  //           console.log(file);
-  //           if (file) {
-  //             setAttachments([...attachments, ...URL.createObjectURL(file)]);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   };
+  useEffect(() => {
+    const handlePaste = (event: ClipboardEvent) => {
+      const items = event.clipboardData?.items;
+      if (items?.length) {
+        for (const item of items) {
+          if (item.type.startsWith("image/")) {
+            const file = item.getAsFile();
+            console.log(file);
+            if (file) {
+              setAttachments([...attachments, ...URL.createObjectURL(file)]);
+            }
+          }
+        }
+      }
+    };
 
-  //   document.addEventListener("paste", handlePaste);
-  //   return () => {
-  //     document.removeEventListener("paste", handlePaste);
-  //   };
-  // }, []);
+    document.addEventListener("paste", handlePaste);
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  }, []);
 
   return (
     <Card>

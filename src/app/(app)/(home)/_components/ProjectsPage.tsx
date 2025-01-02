@@ -1,25 +1,13 @@
 "use client";
 
-import { useDisclosure } from "@mantine/hooks";
 import {
   createProject,
   deleteProject,
   updateProject,
 } from "@/app/actions/projects.action";
 import { Project } from "@/backend/persistence/schema";
-import { queryClient } from "@/lib/config/query-client";
+import ConfirmationDialog from "@/components/custom/ConfirmationDialog";
 import { PaginationWrapper } from "@/components/PaginationWrapper";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,6 +22,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -42,9 +38,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { queryClient } from "@/lib/config/query-client";
 import { PaginatedResponse } from "@/lib/models/app.model";
-import { appFormatDate } from "@/lib/utils";
+import { appFormatDate, getFileUrl } from "@/lib/utils";
+import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
+import clsx from "clsx";
 import {
   LayoutGrid,
   List,
@@ -53,21 +52,11 @@ import {
   Search,
   SquareKanban,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import ProjectFormDrawer from "./ProjectFormDrawer";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import clsx from "clsx";
-import ConfirmationDialog from "@/components/custom/ConfirmationDialog";
-import Image from "next/image";
 
 const statusBadgeColorMap = {
   active: "bg-green-500",
@@ -187,10 +176,10 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     <TableRow key={project.id} data-project-id={project.id}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
-                          {project?.logoUrl ? (
+                          {project?.logoPath ? (
                             <div className="border-2 border-gray-200 rounded-md h-6 w-6 object-cover overflow-hidden">
                               <Image
-                                src={project?.logoUrl}
+                                src={getFileUrl(project?.logoPath)}
                                 alt={project?.title + " logo"}
                                 width={24}
                                 height={24}
@@ -255,10 +244,10 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     <CardHeader>
                       <CardTitle className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                          {project?.logoUrl ? (
+                          {project?.logoPath ? (
                             <div className="border-2 border-gray-200 rounded-md h-[26px] w-[26px] object-cover overflow-hidden">
                               <Image
-                                src={project?.logoUrl}
+                                src={getFileUrl(project?.logoPath)}
                                 alt={project?.title + " logo"}
                                 width={26}
                                 height={26}

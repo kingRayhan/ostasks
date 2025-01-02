@@ -22,3 +22,8 @@ export const getFileUrl = (file: File | string) => {
   }
   return URL.createObjectURL(file);
 };
+
+export const getFileKeyFromUrl = (url: string) => {
+  const urlParts = url.split("r2.dev/");
+  return urlParts[1];
+};

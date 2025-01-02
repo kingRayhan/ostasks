@@ -63,7 +63,7 @@ export const GET = async (request: Request) => {
       id: true,
       title: true,
       description: true,
-      logoUrl: true,
+      logoPath: true,
       status: true,
       createdAt: true,
       updatedAt: true,

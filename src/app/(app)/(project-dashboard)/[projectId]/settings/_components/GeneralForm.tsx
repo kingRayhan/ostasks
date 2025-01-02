@@ -20,6 +20,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { ErrorMessage } from "@hookform/error-message";
 import { Loader, Upload, X } from "lucide-react";
 import useFileUpload from "@/hooks/useFileUpload";
+import { getFileKeyFromUrl } from "@/lib/utils";
 
 interface GeneralFormProps {
   project: Project;
@@ -28,24 +29,24 @@ interface GeneralFormProps {
 
 const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
   const [logo, setLogo] = useState<string | null>(
-    `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${project?.logoPath}` || null
+    project?.logoPath
+      ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${project?.logoPath}`
+      : null
   );
-  const { uploadFile } = useFileUpload();
+  const { uploadFiles, deleteFiles } = useFileUpload(
+    `projects/${project.id}/logo/`
+  );
 
   const handleLogoUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogo(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      const uploadResponse = await uploadFile(file);
-      if (uploadResponse?.key) {
-        await onSave({ ...project, logoPath: uploadResponse?.key } as any);
+      setLogo(URL.createObjectURL(file));
+      const uploadResponse = await uploadFiles([file]);
+      if (uploadResponse?.[0]?.key) {
+        setLogo(uploadResponse?.[0]?.url);
+        await onSave({ ...project, logoPath: uploadResponse?.[0]?.key } as any);
       }
     }
   };
@@ -71,11 +72,18 @@ const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
     await onSave(data);
   };
 
+  const handleDeleteLogo = async () => {
+    await deleteFiles([getFileKeyFromUrl(logo as string)]);
+    setLogo(null);
+    await onSave({ ...project, logoPath: null } as any);
+  };
+
   return (
     <form
       onSubmit={form.handleSubmit(handleSubmit)}
       className="flex flex-col gap-4"
     >
+      <pre>{JSON.stringify({ project, logo }, null, 2)}</pre>
       <div>
         <Label>Project Logo</Label>
         <div className="mt-2 flex items-center gap-4">
@@ -88,7 +96,7 @@ const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
                   className="w-full h-full object-cover"
                 />
                 <button
-                  onClick={() => setLogo(null)}
+                  onClick={handleDeleteLogo}
                   className="absolute top-1 right-1 p-1 bg-background/80 rounded-full"
                 >
                   <X className="w-4 h-4" />
@@ -190,6 +198,3 @@ const validationSchema = yup.object({
 });
 
 type TForm = InferType<typeof validationSchema>;
-function uploadFile(file: any): { url: any } | PromiseLike<{ url: any }> {
-  throw new Error("Function not implemented.");
-}
