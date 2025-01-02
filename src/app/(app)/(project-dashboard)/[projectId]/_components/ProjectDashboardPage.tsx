@@ -1,6 +1,6 @@
 "use client";
 
-import { bootstrapItem } from "@/app/actions/items.action";
+import { bootstrapItem } from "@/actions/items.action";
 import { Project, ProjectItem } from "@/backend/persistence/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

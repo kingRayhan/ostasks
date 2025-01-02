@@ -4,7 +4,7 @@ import {
   createProject,
   deleteProject,
   updateProject,
-} from "@/app/actions/projects.action";
+} from "@/actions/projects.action";
 import { Project } from "@/backend/persistence/schema";
 import ConfirmationDialog from "@/components/custom/ConfirmationDialog";
 import { PaginationWrapper } from "@/components/PaginationWrapper";
