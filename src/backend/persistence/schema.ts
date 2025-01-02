@@ -33,7 +33,9 @@ export const projects = pgTable("projects", {
   description: text("description"),
   logoPath: varchar("logo_path", { length: 255 }),
   status: varchar("status").default("active"),
-  creatorUserId: uuid("creator_userid").references(() => users.id),
+  creatorUserId: uuid("creator_userid").references(() => users.id, {
+    onDelete: "cascade",
+  }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -70,7 +72,9 @@ export const items = pgTable("items", {
     .array()
     .notNull()
     .default(sql`'{}'::text[]`),
-  creatorUserId: uuid("creator_userid").references(() => users.id),
+  creatorUserId: uuid("creator_userid").references(() => users.id, {
+    onDelete: "cascade",
+  }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
