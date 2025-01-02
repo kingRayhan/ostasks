@@ -1,7 +1,7 @@
 "use client";
 import { QueryClientProvider } from "@tanstack/react-query";
 
-import { queryClient } from "@/common/config/query-client";
+import { queryClient } from "@/lib/config/query-client";
 
 export function Scaffold({ children }: { children: React.ReactNode }) {
   return (

@@ -70,6 +70,7 @@ export const GET = async (request: Request) => {
       id: true,
       title: true,
       // body: true,
+      serialNumber: true,
       status: true,
       type: true,
       createdAt: true,

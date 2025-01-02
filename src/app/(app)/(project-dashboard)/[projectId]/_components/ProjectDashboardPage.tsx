@@ -29,6 +29,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import AppItemCard from "./AppItemCard";
 import Image from "next/image";
+import { getFileUrl } from "@/lib/utils";
 
 enum ItemStatus {
   Todo,
@@ -130,10 +131,10 @@ const ProjectDashboardPage: React.FC<Props> = ({
           {/* Search and filter */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {project?.logoUrl ? (
+              {project?.logoPath ? (
                 <div className="border-2 border-gray-200 rounded-md h-10 w-10 object-cover overflow-hidden">
                   <Image
-                    src={project?.logoUrl}
+                    src={getFileUrl(project?.logoPath)}
                     alt={project?.title + " logo"}
                     width={40}
                     height={40}
@@ -336,15 +337,7 @@ const ProjectDashboardPage: React.FC<Props> = ({
 
         <div className="space-y-2">
           {itemQuery.data?.items?.map((item) => (
-            <AppItemCard
-              key={item.id}
-              id={item.id as string}
-              title={item?.title || ""}
-              status={item?.status as any}
-              createdAt={item?.createdAt as Date}
-              creatorName={(item as any)["creator"].username}
-              type={item.type as any}
-            />
+            <AppItemCard key={item.id} item={item} projectId={projectId} />
           ))}
         </div>
       </main>

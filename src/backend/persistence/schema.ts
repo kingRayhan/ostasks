@@ -8,9 +8,10 @@ import {
   uuid,
   pgEnum,
   integer,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -30,7 +31,7 @@ export const projects = pgTable("projects", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }),
   description: text("description"),
-  logoUrl: varchar("logo_url", { length: 255 }),
+  logoPath: varchar("logo_path", { length: 255 }),
   status: varchar("status").default("active"),
   creatorUserId: uuid("creator_userid").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
@@ -65,11 +66,16 @@ export const items = pgTable("items", {
   projectId: uuid("project_id").references(() => projects.id, {
     onDelete: "cascade",
   }),
+  attachments: text("attachments")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
   creatorUserId: uuid("creator_userid").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 export type ProjectItem = typeof items.$inferSelect;
+export type ItemInput = typeof items.$inferInsert;
 
 export const itemGroups = pgTable("item_groups", {
   id: uuid("id").primaryKey().defaultRandom(),

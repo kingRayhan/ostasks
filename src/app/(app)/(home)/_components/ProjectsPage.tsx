@@ -7,7 +7,7 @@ import {
   updateProject,
 } from "@/app/actions/projects.action";
 import { Project } from "@/backend/persistence/schema";
-import { queryClient } from "@/common/config/query-client";
+import { queryClient } from "@/lib/config/query-client";
 import { PaginationWrapper } from "@/components/PaginationWrapper";
 import {
   AlertDialog,

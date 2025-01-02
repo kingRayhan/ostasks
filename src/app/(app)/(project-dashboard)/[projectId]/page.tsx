@@ -84,6 +84,7 @@ const getProjectItemsFromDatabase = async (
       title: true,
       status: true,
       type: true,
+      serialNumber: true,
       createdAt: true,
     },
     with: {
@@ -125,7 +126,7 @@ const getProjectDetailsFromDatabase = async (projectId: string) => {
       id: true,
       title: true,
       description: true,
-      logoUrl: true,
+      logoPath: true,
       status: true,
     },
   });

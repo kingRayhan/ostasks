@@ -15,3 +15,10 @@ export const appFormatDate = (date?: Date | null) => {
     day: "numeric",
   });
 };
+
+export const getFileUrl = (file: File | string) => {
+  if (typeof file === "string") {
+    return `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${file}`;
+  }
+  return URL.createObjectURL(file);
+};

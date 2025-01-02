@@ -56,7 +56,7 @@ const ProjectSettingsPage: React.FC<ProjectSettingPageProps> = ({
                   await toast.promise(
                     updateProject({
                       projectId: project.id,
-                      payload: { ..._project, logoUrl: _project.logoUrl },
+                      payload: { ..._project, logoPath: _project.logoPath },
                     }),
                     {
                       loading: "Updating...",

@@ -27,7 +27,9 @@ interface GeneralFormProps {
 }
 
 const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
-  const [logo, setLogo] = useState<string | null>(project?.logoUrl || null);
+  const [logo, setLogo] = useState<string | null>(
+    `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${project?.logoPath}` || null
+  );
   const { uploadFile } = useFileUpload();
 
   const handleLogoUpload = async (
@@ -41,9 +43,9 @@ const GeneralForm: React.FC<GeneralFormProps> = ({ project, onSave }) => {
       };
       reader.readAsDataURL(file);
 
-      const url = await uploadFile(file);
-      if (url) {
-        await onSave({ ...project, logoUrl: url } as any);
+      const uploadResponse = await uploadFile(file);
+      if (uploadResponse?.key) {
+        await onSave({ ...project, logoPath: uploadResponse?.key } as any);
       }
     }
   };
@@ -184,7 +186,10 @@ const validationSchema = yup.object({
   title: yup.string().required().label("Project name"),
   description: yup.string().nullable().optional().label("Description"),
   status: yup.string().nullable().optional().label("Status"),
-  logoUrl: yup.string().nullable().optional().label("Logo URL"),
+  logoPath: yup.string().nullable().optional().label("Logo path"),
 });
 
 type TForm = InferType<typeof validationSchema>;
+function uploadFile(file: any): { url: any } | PromiseLike<{ url: any }> {
+  throw new Error("Function not implemented.");
+}

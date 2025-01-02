@@ -1,3 +1,5 @@
+"use client";
+
 import { ErrorMessage } from "@hookform/error-message";
 import { Loader } from "lucide-react";
 import { useEffect, useRef } from "react";
