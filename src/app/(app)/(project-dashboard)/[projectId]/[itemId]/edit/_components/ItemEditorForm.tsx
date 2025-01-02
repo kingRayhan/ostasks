@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import toast from "react-hot-toast";
-import { updateItem } from "@/app/actions/items.action";
+import { updateItem } from "@/actions/items.action";
 import useFileUpload from "@/hooks/useFileUpload";
 
 interface Props {

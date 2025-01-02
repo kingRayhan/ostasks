@@ -4,7 +4,7 @@ import { MoveLeft, Plus } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-import { updateProject } from "@/app/actions/projects.action";
+import { updateProject } from "@/actions/projects.action";
 import { Project } from "@/backend/persistence/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";

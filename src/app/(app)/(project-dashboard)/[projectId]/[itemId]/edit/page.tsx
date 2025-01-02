@@ -3,7 +3,7 @@ import ItemEditorForm from "./_components/ItemEditorForm";
 import { db } from "@/backend/persistence/db";
 import { and, eq, sql } from "drizzle-orm";
 import { items } from "@/backend/persistence/schema";
-import { updateItem } from "@/app/actions/items.action";
+import { updateItem } from "@/actions/items.action";
 import toast from "react-hot-toast";
 
 const getItemDetails = async (itemId: string) => {
