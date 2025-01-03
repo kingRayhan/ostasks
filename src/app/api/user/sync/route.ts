@@ -10,7 +10,6 @@ export async function POST(req: Request) {
   // const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
   // if (!WEBHOOK_SECRET) throw new Error("Missing CLERK_WEBHOOK_SECRET");
   const _clerkClient = await clerkClient();
-
   const payload = await req.json();
 
   console.log(JSON.stringify(payload, null, 2));
@@ -54,6 +53,11 @@ export async function POST(req: Request) {
           publicMetadata: {
             dbUserId: createdUser?.[0].id,
           },
+        });
+
+        console.log({
+          createdUser,
+          payload,
         });
         break;
 

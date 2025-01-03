@@ -313,7 +313,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({
 
         <div className="py-4">
           <PaginationWrapper
-            totalItems={projectsQuery.data?.meta.total || 0}
+            totalItems={projectsQuery.data?.meta?.total || 0}
             itemsPerPage={hydratedPaginatedProjects?.meta?.limit || 10}
             initialPage={hydratedPaginatedProjects?.meta?.page || 1}
             onPageChange={navigateToPage}
